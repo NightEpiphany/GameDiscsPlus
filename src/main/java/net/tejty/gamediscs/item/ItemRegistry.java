@@ -1,53 +1,66 @@
 package net.tejty.gamediscs.item;
 
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.Rarity;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraft.item.Item;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.Rarity;
 import net.tejty.gamediscs.GameDiscsMod;
 import net.tejty.gamediscs.games.gamediscs.*;
 import net.tejty.gamediscs.item.custom.GameDiscItem;
 import net.tejty.gamediscs.item.custom.GamingConsoleItem;
 
 public class ItemRegistry {
-    public static final DeferredRegister<Item> ITEMS =
-            DeferredRegister.create(ForgeRegistries.ITEMS, GameDiscsMod.MOD_ID);
+    public static final Item GAMING_CONSOLE = registerItem("gaming_console",
+            new GamingConsoleItem(new Item.Settings().rarity(Rarity.UNCOMMON)));
 
-    public static final RegistryObject<Item> GAMING_CONSOLE = ITEMS.register("gaming_console",
-            () -> new GamingConsoleItem(new Item.Properties().rarity(Rarity.UNCOMMON)));
-    public static final RegistryObject<Item> GAME_DISC_FLAPPY_BIRD = ITEMS.register("game_disc_flappy_bird",
-            () -> new GameDiscItem(new Item.Properties().rarity(Rarity.RARE), Component.translatable("gamediscs.flappy_bird").withStyle(ChatFormatting.YELLOW)));
-    public static final RegistryObject<Item> GAME_DISC_SLIME = ITEMS.register("game_disc_slime", () -> new GameDiscItem(
-            new Item.Properties().rarity(Rarity.RARE), Component.translatable("gamediscs.slime").withStyle(ChatFormatting.DARK_GREEN)));
-    public static final RegistryObject<Item> GAME_DISC_BLOCKTRIS = ITEMS.register("game_disc_blocktris", () -> new GameDiscItem(
-            new Item.Properties().rarity(Rarity.RARE), Component.translatable("gamediscs.blocktris").withStyle(ChatFormatting.BLUE)));
-    public static final RegistryObject<Item> GAME_DISC_TNT_SWEEPER = ITEMS.register("game_disc_tnt_sweeper", () -> new GameDiscItem(
-            new Item.Properties().rarity(Rarity.RARE), Component.translatable("gamediscs.tnt_sweeper").withStyle(ChatFormatting.RED)));
-    public static final RegistryObject<Item> GAME_DISC_PONG = ITEMS.register("game_disc_pong", () -> new GameDiscItem(
-            new Item.Properties().rarity(Rarity.RARE), Component.translatable("gamediscs.pong_game").withStyle(ChatFormatting.WHITE)));
-    public static final RegistryObject<Item> GAME_DISC_FROGGIE = ITEMS.register("game_disc_froggie", () -> new GameDiscItem(
-            new Item.Properties().rarity(Rarity.RARE), Component.translatable("gamediscs.froggie").withStyle(ChatFormatting.GREEN)));
-    public static final RegistryObject<Item> GAME_DISC_RABBIT = ITEMS.register("game_disc_rabbit", () -> new GameDiscItem(
-            new Item.Properties().rarity(Rarity.RARE), Component.translatable("gamediscs.rabbit").withStyle(ChatFormatting.GOLD)));
-
-
-    public static final RegistryObject<Item> REDSTONE_CIRCUIT = ITEMS.register("redstone_circuit",
-            () -> new Item(new Item.Properties()));
-    public static final RegistryObject<Item> PROCESSOR = ITEMS.register("processor",
-            () -> new Item(new Item.Properties()));
-    public static final RegistryObject<Item> BATTERY = ITEMS.register("battery",
-            () -> new Item(new Item.Properties()));
-    public static final RegistryObject<Item> DISPLAY = ITEMS.register("display",
-            () -> new Item(new Item.Properties()));
-    public static final RegistryObject<Item> CONTROL_PAD = ITEMS.register("control_pad",
-            () -> new Item(new Item.Properties()));
+    public static final Item GAME_DISC_FLAPPY_BIRD = registerItem("game_disc_flappy_bird",
+            new GameDiscItem(new Item.Settings().rarity(Rarity.RARE), Text.translatable("gamediscs.flappy_bird").formatted(Formatting.YELLOW)));
+    public static final Item GAME_DISC_SLIME = registerItem("game_disc_slime",
+            new GameDiscItem(new Item.Settings().rarity(Rarity.RARE), Text.translatable("gamediscs.slime").formatted(Formatting.DARK_GREEN)));
+    public static final Item GAME_DISC_BLOCKTRIS = registerItem("game_disc_blocktris",
+            new GameDiscItem(new Item.Settings().rarity(Rarity.RARE), Text.translatable("gamediscs.blocktris").formatted(Formatting.BLUE)));
+    public static final Item GAME_DISC_TNT_SWEEPER = registerItem("game_disc_tnt_sweeper",
+            new GameDiscItem(new Item.Settings().rarity(Rarity.RARE), Text.translatable("gamediscs.tnt_sweeper").formatted(Formatting.RED)));
+    public static final Item GAME_DISC_PONG = registerItem("game_disc_pong",
+            new GameDiscItem(new Item.Settings().rarity(Rarity.RARE), Text.translatable("gamediscs.pong_game").formatted(Formatting.WHITE)));
+    public static final Item GAME_DISC_FROGGIE = registerItem("game_disc_froggie",
+            new GameDiscItem(new Item.Settings().rarity(Rarity.RARE), Text.translatable("gamediscs.froggie").formatted(Formatting.GREEN)));
+    public static final Item GAME_DISC_RABBIT = registerItem("game_disc_rabbit",
+            new GameDiscItem(new Item.Settings().rarity(Rarity.RARE), Text.translatable("gamediscs.rabbit").formatted(Formatting.GOLD)));
+    public static final Item GAME_DISC_GRID_2048 = registerItem("game_disc_grid_2048",
+            new GameDiscItem(new Item.Settings().rarity(Rarity.RARE), Text.translatable("gamediscs.grid_2048").formatted(Formatting.GRAY)));
+    public static final Item GAME_DISC_GOBANG = registerItem("game_disc_gobang",
+            new GameDiscItem(new Item.Settings().rarity(Rarity.RARE), Text.translatable("gamediscs.gobang").formatted(Formatting.DARK_GRAY)));
+    public static final Item GAME_DISC_GOBANG_AI = registerItem("game_disc_gobang_ai",
+            new GameDiscItem(new Item.Settings().rarity(Rarity.RARE), Text.translatable("gamediscs.gobang_ai").formatted(Formatting.DARK_GRAY)));
+    public static final Item GAME_DISC_PLANE_WAR = registerItem("game_disc_plane_war",
+            new GameDiscItem(new Item.Settings().rarity(Rarity.RARE), Text.translatable("gamediscs.plane_war").formatted(Formatting.DARK_AQUA)));
 
 
-    public static void register(IEventBus eventBus) {
-        ITEMS.register(eventBus);
+    public static final Item REDSTONE_CIRCUIT = registerItem("redstone_circuit",
+            new Item(new Item.Settings()));
+
+    public static final Item PROCESSOR = registerItem("processor",
+            new Item(new Item.Settings()));
+
+    public static final Item BATTERY = registerItem("battery",
+            new Item(new Item.Settings()));
+
+    public static final Item DISPLAY = registerItem("display",
+            new Item(new Item.Settings()));
+
+    public static final Item CONTROL_PAD = registerItem("control_pad",
+            new Item(new Item.Settings()));
+
+
+    private static Item registerItem(String name, Item item) {
+        return Registry.register(Registries.ITEM, Identifier.of(GameDiscsMod.MOD_ID, name), item);
+    }
+
+    public static void registerModItems() {
+        GameDiscsMod.LOGGER.info("Registering Mod Items for " + GameDiscsMod.MOD_ID);
     }
 }

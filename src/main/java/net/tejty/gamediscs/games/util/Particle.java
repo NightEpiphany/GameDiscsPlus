@@ -1,36 +1,36 @@
 package net.tejty.gamediscs.games.util;
 
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.phys.Vec2;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec2f;
 import net.tejty.gamediscs.games.graphics.*;
 
 public class Particle {
     // Properties of the Particle
     private int lifetime;
     public ParticleLevel level;
-    private Vec2 pos = Vec2.ZERO;
-    private Vec2 vel = Vec2.ZERO;
+    private Vec2f pos = Vec2f.ZERO;
+    private Vec2f vel = Vec2f.ZERO;
     private Renderer image = new Renderer();
-    public Particle(Vec2 pos, ParticleColor color, int lifetime, ParticleLevel level) {
+    public Particle(Vec2f pos, ParticleColor color, int lifetime, ParticleLevel level) {
         this.pos = pos;
         this.image = new BasicParticleRenderer(color);
         this.lifetime = lifetime;
         this.level = level;
     }
-    public Particle(Vec2 pos, Renderer image, int lifetime, ParticleLevel level) {
+    public Particle(Vec2f pos, Renderer image, int lifetime, ParticleLevel level) {
         this.pos = pos;
         this.image = image;
         this.lifetime = lifetime;
         this.level = level;
     }
-    public Particle(Vec2 pos, ResourceLocation file, int fileWidth, int fileHeight, int lifetime, ParticleLevel level) {
+    public Particle(Vec2f pos, Identifier file, int fileWidth, int fileHeight, int lifetime, ParticleLevel level) {
         this.pos = pos;
         this.lifetime = lifetime;
         this.level = level;
         this.image = new BreakParticleRenderer(file, fileWidth, fileHeight);
     }
-    public Particle(Vec2 pos, ResourceLocation file, int fileWidth, int fileHeight, int posX, int posY, int width, int height, int lifetime, ParticleLevel level) {
+    public Particle(Vec2f pos, Identifier file, int fileWidth, int fileHeight, int posX, int posY, int width, int height, int lifetime, ParticleLevel level) {
         this.pos = pos;
         this.lifetime = lifetime;
         this.level = level;
@@ -38,7 +38,7 @@ public class Particle {
     }
 
     // getters and setters
-    public Vec2 getPos() {
+    public Vec2f getPos() {
         return pos;
     }
     public float getX() {
@@ -47,19 +47,19 @@ public class Particle {
     public float getY() {
         return pos.y;
     }
-    public void setPos(Vec2 pos) {
+    public void setPos(Vec2f pos) {
         this.pos = pos;
     }
-    public void moveBy(Vec2 offset) {
+    public void moveBy(Vec2f offset) {
         pos = pos.add(offset);
     }
-    public Vec2 getVelocity() {
+    public Vec2f getVelocity() {
         return vel;
     }
-    public void setVelocity(Vec2 vel) {
+    public void setVelocity(Vec2f vel) {
         this.vel = vel;
     }
-    public void addVelocity(Vec2 vel) {
+    public void addVelocity(Vec2f vel) {
         this.vel = this.vel.add(vel);
     }
     public void tick() {
@@ -73,7 +73,7 @@ public class Particle {
      * @param gameX X position of game
      * @param gameY Y position of game
      */
-    public void render(GuiGraphics graphics, int gameX, int gameY, GameStage stage) {
+    public void render(DrawContext graphics, int gameX, int gameY, GameStage stage) {
         if (level.isFor(stage)) {
             image.render(graphics, gameX + (int) this.pos.x, gameY + (int) this.pos.y);
         }

@@ -1,38 +1,24 @@
 package net.tejty.gamediscs;
 
-import com.mojang.logging.LogUtils;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.server.ServerStartingEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.tejty.gamediscs.sounds.SoundRegistry;
-import net.tejty.gamediscs.util.loot.LootModifiers;
-import net.tejty.gamediscs.util.creativetab.CreativeTabs;
+import net.fabricmc.api.ModInitializer;
 import net.tejty.gamediscs.item.ItemRegistry;
+import net.tejty.gamediscs.sounds.SoundRegistry;
+import net.tejty.gamediscs.util.DiscLootTablesModifiers;
+import net.tejty.gamediscs.util.creativetab.CreativeTabs;
 import net.tejty.gamediscs.util.networking.ModMessages;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@Mod(GameDiscsMod.MOD_ID)
-public class GameDiscsMod {
+public class GameDiscsMod implements ModInitializer {
     public static final String MOD_ID = "gamediscs";
-    public static final Logger LOGGER = LogUtils.getLogger();
-    public GameDiscsMod() {
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        ItemRegistry.register(modEventBus);
-        CreativeTabs.register(modEventBus);
-        LootModifiers.register(modEventBus);
-        SoundRegistry.register(modEventBus);
+    public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
-        modEventBus.addListener(this::commonSetup);
-        MinecraftForge.EVENT_BUS.register(this);
-    }
-
-    private void commonSetup(final FMLCommonSetupEvent event) {
-        ModMessages.register();
+    @Override
+    public void onInitialize() {
+        ItemRegistry.registerModItems();
+        CreativeTabs.registerItemGroups();
+        DiscLootTablesModifiers.modifyLootTables();
+        SoundRegistry.registerSounds();
+        ModMessages.registerC2SPackets();
     }
 }

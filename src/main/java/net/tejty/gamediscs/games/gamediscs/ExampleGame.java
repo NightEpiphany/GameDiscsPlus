@@ -1,9 +1,9 @@
 package net.tejty.gamediscs.games.gamediscs;
 
-import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import net.tejty.gamediscs.GameDiscsMod;
 import net.tejty.gamediscs.games.controls.Button;
 import net.tejty.gamediscs.games.util.Game;
@@ -60,7 +60,7 @@ public class ExampleGame extends Game {
     }
 
     @Override
-    public synchronized void render(GuiGraphics graphics, int posX, int posY) {
+    public synchronized void render(DrawContext graphics, int posX, int posY) {
         // Calls render of super
         super.render(graphics, posX, posY);
 
@@ -85,9 +85,9 @@ public class ExampleGame extends Game {
         // Example: if (button.isActionButton()) { [Do something] }
     }
     @Override
-    public ResourceLocation getBackground() {
+    public Identifier getBackground() {
         // Change here:
-        return new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/background/your_background.png");
+        return Identifier.of(GameDiscsMod.MOD_ID, "textures/games/background/your_background.png");
     }
     @Override
     public boolean showScoreBox() {
@@ -97,16 +97,16 @@ public class ExampleGame extends Game {
     @Override
     public int scoreColor() {
         // Color for score text
-        return ChatFormatting.YELLOW.getColor();
+        return Formatting.YELLOW.getColorValue();
     }
     @Override
-    public Component getName() {
+    public Text getName() {
         // Change to name of your game
-        return Component.translatable("gamediscs.your_game");
+        return Text.translatable("gamediscs.your_game");
     }
     @Override
-    public ResourceLocation getIcon() {
+    public Identifier getIcon() {
         // Change icon here:
-        return new ResourceLocation(GameDiscsMod.MOD_ID, "textures/item/your_icon.png");
+        return Identifier.of(GameDiscsMod.MOD_ID, "textures/item/your_icon.png");
     }
 }

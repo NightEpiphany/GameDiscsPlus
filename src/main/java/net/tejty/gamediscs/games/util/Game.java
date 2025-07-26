@@ -1,15 +1,16 @@
 package net.tejty.gamediscs.games.util;
 
-import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.phys.Vec2;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec2f;
 import net.tejty.gamediscs.GameDiscsMod;
 import net.tejty.gamediscs.games.audio.SoundPlayer;
 import net.tejty.gamediscs.games.controls.Button;
@@ -19,8 +20,7 @@ import net.tejty.gamediscs.games.graphics.Renderer;
 import net.tejty.gamediscs.item.ItemRegistry;
 import net.tejty.gamediscs.item.custom.GamingConsoleItem;
 import net.tejty.gamediscs.sounds.SoundRegistry;
-import net.tejty.gamediscs.util.networking.ModMessages;
-import net.tejty.gamediscs.util.networking.packet.SetBestScoreC2SPacket;
+import net.tejty.gamediscs.util.networking.payload.SetBestScoreC2SPayload;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -52,7 +52,7 @@ public class Game {
     }
 
     // Particles
-    private List<Particle> particles = new ArrayList<>();
+    private final List<Particle> particles = new ArrayList<>();
     public Game() {
 
     }
@@ -77,12 +77,12 @@ public class Game {
     /**
      * Stops the game, shows die screen, and sets the best score
      */
-    public synchronized  void die() {
+    public synchronized void die() {
         if (getConsole().getItem() instanceof GamingConsoleItem) {
             // Tries to set the best score
             String gameName = this.getClass().getName().substring(this.getClass().getPackageName().length() + 1);
-            if (GamingConsoleItem.getBestScore(getConsole(), gameName, Minecraft.getInstance().player) < score) {
-                ModMessages.sendToServer(new SetBestScoreC2SPacket(gameName, score));
+            if (GamingConsoleItem.getBestScore(getConsole(), gameName, MinecraftClient.getInstance().player) < score) {
+                ClientPlayNetworking.send(new SetBestScoreC2SPayload(gameName, score));
                 soundPlayer.playNewBest();
                 spawnConfetti();
             } else {
@@ -97,7 +97,7 @@ public class Game {
 
     public synchronized void lostLife() {
         lives--;
-        soundPlayer.play(SoundRegistry.EXPLOSION.get());
+        soundPlayer.play(SoundRegistry.EXPLOSION);
         respawn();
         if (lives <= 0) {
             die();
@@ -113,14 +113,14 @@ public class Game {
     /**
      * Stops the game, shows win screen, and sets the best score
      */
-    public synchronized  void win() {
+    public synchronized void win() {
         soundPlayer.playNewBest();
         spawnConfetti();
         if (getConsole().getItem() instanceof GamingConsoleItem) {
             // Tries to set the best score
             String gameName = this.getClass().getName().substring(this.getClass().getPackageName().length() + 1);
-            if (GamingConsoleItem.getBestScore(getConsole(), gameName, Minecraft.getInstance().player) < score) {
-                ModMessages.sendToServer(new SetBestScoreC2SPacket(gameName, score));
+            if (GamingConsoleItem.getBestScore(getConsole(), gameName, MinecraftClient.getInstance().player) < score) {
+                ClientPlayNetworking.send(new SetBestScoreC2SPayload(gameName, score));
             }
         }
 
@@ -134,22 +134,22 @@ public class Game {
      */
     private ItemStack getConsole() {
         // Gets player of this client
-        Player player = Minecraft.getInstance().player;
+        PlayerEntity player = MinecraftClient.getInstance().player;
         assert player != null;
 
         // Returns item player has in mainhand or offhand, depending on if its Gaming Console
-        ItemStack item = player.getMainHandItem();
+        ItemStack item = player.getMainHandStack();
         if (item.getItem() instanceof GamingConsoleItem) {
             return item;
         }
         else {
-            item = player.getOffhandItem();
+            item = player.getOffHandStack();
             if (item.getItem() instanceof GamingConsoleItem) {
                 return item;
             }
         }
         // If there is no Gaming Console in mainhand or offhand of the player, it creates a new one
-        return new ItemStack(ItemRegistry.GAMING_CONSOLE.get());
+        return new ItemStack(ItemRegistry.GAMING_CONSOLE);
     }
 
     /**
@@ -183,14 +183,14 @@ public class Game {
 
     /**
      * Renders the whole game
-     * @param graphics GuiGraphics used for rendering
+     * @param graphics DrawContext used for rendering
      * @param posX X position of the game area
      * @param posY Y position of the game area
      */
-    public synchronized void render(GuiGraphics graphics, int posX, int posY) {
+    public synchronized void render(DrawContext graphics, int posX, int posY) {
         // Renders background
         if (getBackground() != null) {
-            graphics.blit(getBackground(), posX, posY, 0, 0, 0, WIDTH, HEIGHT, WIDTH, HEIGHT);
+            graphics.drawTexture(getBackground(), posX, posY, 0, 0, 0, WIDTH, HEIGHT, WIDTH, HEIGHT);
         }
         // Renders overlay
         renderOverlay(graphics, posX, posY);
@@ -198,133 +198,175 @@ public class Game {
 
     /**
      * Renders all overlay things including score, die screen, and "press any key" text
-     * @param graphics GuiGraphics used for rendering
+     * @param graphics DrawContext used for rendering
      * @param posX X position
      * @param posY Y position
      */
-    public synchronized void renderOverlay(GuiGraphics graphics, int posX, int posY) {
+    public synchronized void renderOverlay(DrawContext graphics, int posX, int posY) {
         // saving font
-        Font font = Minecraft.getInstance().font;
+        TextRenderer font = MinecraftClient.getInstance().textRenderer;
 
         // If outside the game
         if (stage != GameStage.PLAYING) {
             // Render "press any key" text
             if (showPressAnyKey()) {
-                graphics.drawString(
+                graphics.drawText(
                         font,
-                        Component.translatable("gui.gamingconsole.press_any_key"),
-                        posX + (WIDTH - font.width(Component.translatable("gui.gamingconsole.press_any_key").getVisualOrderText())) / 2 + 1,
-                        posY + HEIGHT - font.lineHeight - 1 - (ticks % 40 <= 20 ? 0 : 1),
+                        Text.translatable("gui.gamingconsole.press_any_key"),
+                        posX + (WIDTH - font.getWidth(Text.translatable("gui.gamingconsole.press_any_key").asOrderedText())) / 2 + 1,
+                        posY + HEIGHT - 1 - font.fontHeight - 1 + (ticks % 40 <= 20 ? 0 : 1),
                         0x373737,
                         false
                 );
-                graphics.drawString(
+                graphics.drawText(
                         font,
-                        Component.translatable("gui.gamingconsole.press_any_key"),
-                        posX + (WIDTH - font.width(Component.translatable("gui.gamingconsole.press_any_key").getVisualOrderText())) / 2,
-                        posY + HEIGHT - font.lineHeight - 2 - (ticks % 40 <= 20 ? 0 : 1),
+                        Text.translatable("gui.gamingconsole.press_any_key"),
+                        posX + (WIDTH - font.getWidth(Text.translatable("gui.gamingconsole.press_any_key").asOrderedText())) / 2,
+                        posY + HEIGHT - 1 - font.fontHeight - 2 + (ticks % 40 <= 20 ? 0 : 1),
+                        0xFFFFFF,
+                        false
+                );
+            }
+
+            if (showMutiPlayerInfo()) {
+                graphics.drawText(
+                        font,
+                        Text.translatable("gui.gamingconsole.mutiplayer"),
+                        posX + (WIDTH - font.getWidth(Text.translatable("gui.gamingconsole.mutiplayer").asOrderedText())) / 2 + 1,
+                        posY + HEIGHT - 1 - font.fontHeight - 1 + (ticks % 40 <= 20 ? 0 : 1),
+                        0x373737,
+                        false
+                );
+                graphics.drawText(
+                        font,
+                        Text.translatable("gui.gamingconsole.mutiplayer"),
+                        posX + (WIDTH - font.getWidth(Text.translatable("gui.gamingconsole.mutiplayer").asOrderedText())) / 2,
+                        posY + HEIGHT - 1 - font.fontHeight - 2 + (ticks % 40 <= 20 ? 0 : 1),
+                        0xFFFFFF,
+                        false
+                );
+            }
+
+            if (showAiReactInfo()) {
+                graphics.drawText(
+                        font,
+                        Text.translatable("gui.gamingconsole.ai_react"),
+                        posX + (WIDTH - font.getWidth(Text.translatable("gui.gamingconsole.ai_react").asOrderedText())) / 2 + 1,
+                        posY + HEIGHT - 1 - font.fontHeight - 1 + (ticks % 40 <= 20 ? 0 : 1),
+                        0x373737,
+                        false
+                );
+                graphics.drawText(
+                        font,
+                        Text.translatable("gui.gamingconsole.ai_react"),
+                        posX + (WIDTH - font.getWidth(Text.translatable("gui.gamingconsole.ai_react").asOrderedText())) / 2,
+                        posY + HEIGHT - 1 - font.fontHeight - 2 + (ticks % 40 <= 20 ? 0 : 1),
                         0xFFFFFF,
                         false
                 );
             }
             // Renders died / won screen
             if (stage == GameStage.DIED || stage == GameStage.WON) {
-                // Renders score board
-                graphics.blit(new ResourceLocation(GameDiscsMod.MOD_ID, "textures/gui/score_board.png"), posX, posY, 0, 0, 0, 140, 100, 140, 100);
 
-                // Text based on won or died
-                Component component = stage == GameStage.DIED ? Component.translatable("gui.gamingconsole.died").withStyle(ChatFormatting.BOLD, ChatFormatting.DARK_RED) : Component.translatable("gui.gamingconsole.won").withStyle(ChatFormatting.BOLD, ChatFormatting.DARK_GREEN);
+                if (this.renderScoreBoard()) {
+                    // Renders score board
+                    graphics.drawTexture(Identifier.of(GameDiscsMod.MOD_ID, "textures/gui/score_board.png"), posX, posY, 0, 0, 0, 140, 100, 140, 100);
 
-                // Renders the outline of the text (four times renders the same text pushed by 1px to all directions)
-                graphics.drawString(
-                        font,
-                        component,
-                        posX + (WIDTH - font.width(component.getVisualOrderText())) / 2,
-                        posY + 29,
-                        Objects.requireNonNull(component.getStyle().getColor()).getValue(),
-                        false
-                );
-                graphics.drawString(
-                        font,
-                        component,
-                        posX + (WIDTH - font.width(component.getVisualOrderText())) / 2,
-                        posY + 31,
-                        component.getStyle().getColor().getValue(),
-                        false
-                );
-                graphics.drawString(
-                        font,
-                        component,
-                        posX + (WIDTH - font.width(component.getVisualOrderText())) / 2 + 1,
-                        posY + 30,
-                        component.getStyle().getColor().getValue(),
-                        false
-                );
-                graphics.drawString(
-                        font,
-                        component,
-                        posX + (WIDTH - font.width(component.getVisualOrderText())) / 2 - 1,
-                        posY + 30,
-                        component.getStyle().getColor().getValue(),
-                        false
-                );
+                    // Text based on won or died
+                    Text component = stage == GameStage.DIED ? Text.translatable("gui.gamingconsole.died").formatted(Formatting.BOLD, Formatting.DARK_RED) : Text.translatable("gui.gamingconsole.won").formatted(Formatting.BOLD, Formatting.DARK_GREEN);
 
-                // Sets the text to be with lighter color
-                component = stage == GameStage.DIED ? Component.translatable("gui.gamingconsole.died").withStyle(ChatFormatting.BOLD, ChatFormatting.RED) : Component.translatable("gui.gamingconsole.won").withStyle(ChatFormatting.BOLD, ChatFormatting.GREEN);
+                    // Renders the outline of the text (four times renders the same text pushed by 1px to all directions)
+                    graphics.drawText(
+                            font,
+                            component,
+                            posX + (WIDTH - font.getWidth(component.asOrderedText())) / 2,
+                            posY + 29,
+                            Objects.requireNonNull(component.getStyle().getColor()).getRgb(),
+                            false
+                    );
+                    graphics.drawText(
+                            font,
+                            component,
+                            posX + (WIDTH - font.getWidth(component.asOrderedText())) / 2,
+                            posY + 31,
+                            component.getStyle().getColor().getRgb(),
+                            false
+                    );
+                    graphics.drawText(
+                            font,
+                            component,
+                            posX + (WIDTH - font.getWidth(component.asOrderedText())) / 2 + 1,
+                            posY + 30,
+                            component.getStyle().getColor().getRgb(),
+                            false
+                    );
+                    graphics.drawText(
+                            font,
+                            component,
+                            posX + (WIDTH - font.getWidth(component.asOrderedText())) / 2 - 1,
+                            posY + 30,
+                            component.getStyle().getColor().getRgb(),
+                            false
+                    );
 
-                // Renders the text
-                graphics.drawString(
-                        font,
-                        component,
-                        posX + (WIDTH - font.width(component.getVisualOrderText())) / 2,
-                        posY + 30,
-                        Objects.requireNonNull(component.getStyle().getColor()).getValue(),
-                        false
-                );
+                    // Sets the text to be with lighter color
+                    component = stage == GameStage.DIED ? Text.translatable("gui.gamingconsole.died").formatted(Formatting.BOLD, Formatting.RED) : Text.translatable("gui.gamingconsole.won").formatted(Formatting.BOLD, Formatting.GREEN);
 
-                // Renders score text
-                component = Component.translatable("gui.gamingconsole.score").append(": ").append(String.valueOf(score)).withStyle(ChatFormatting.YELLOW);
-                graphics.drawString(
-                        font,
-                        component,
-                        posX + (WIDTH - font.width(component.getVisualOrderText())) / 2,
-                        posY + 35 + font.lineHeight,
-                        Objects.requireNonNull(component.getStyle().getColor()).getValue(),
-                        false
-                );
+                    // Renders the text
+                    graphics.drawText(
+                            font,
+                            component,
+                            posX + (WIDTH - font.getWidth(component.asOrderedText())) / 2,
+                            posY + 30,
+                            Objects.requireNonNull(component.getStyle().getColor()).getRgb(),
+                            false
+                    );
 
-                // Renders best score text
-                int bestScore = GamingConsoleItem.getBestScore(getConsole(), this.getClass().getName().substring(this.getClass().getPackageName().length() + 1), Minecraft.getInstance().player);
-                component = Component.translatable(score >= bestScore ? "gui.gamingconsole.new_best_score" : "gui.gamingconsole.best_score").append(": ").append(String.valueOf(bestScore)).withStyle(score >= bestScore ? ChatFormatting.GREEN : ChatFormatting.YELLOW);
-                graphics.drawString(
-                        font,
-                        component,
-                        posX + (WIDTH - font.width(component.getVisualOrderText())) / 2,
-                        posY + 50 + font.lineHeight,
-                        Objects.requireNonNull(component.getStyle().getColor()).getValue(),
-                        false
-                );
+                    // Renders score text
+                    component = Text.translatable("gui.gamingconsole.score").append(": ").append(String.valueOf(score)).formatted(Formatting.YELLOW);
+                    graphics.drawText(
+                            font,
+                            component,
+                            posX + (WIDTH - font.getWidth(component.asOrderedText())) / 2,
+                            posY + 35 + font.fontHeight,
+                            Objects.requireNonNull(component.getStyle().getColor()).getRgb(),
+                            false
+                    );
+
+                    // Renders best score text
+                    int bestScore = GamingConsoleItem.getBestScore(getConsole(), this.getClass().getName().substring(this.getClass().getPackageName().length() + 1), MinecraftClient.getInstance().player);
+                    component = Text.translatable(score >= bestScore ? "gui.gamingconsole.new_best_score" : "gui.gamingconsole.best_score").append(": ").append(String.valueOf(bestScore)).formatted(score >= bestScore ? Formatting.GREEN : Formatting.YELLOW);
+                    graphics.drawText(
+                            font,
+                            component,
+                            posX + (WIDTH - font.getWidth(component.asOrderedText())) / 2,
+                            posY + 50 + font.fontHeight,
+                            Objects.requireNonNull(component.getStyle().getColor()).getRgb(),
+                            false
+                    );
+                }
             }
         }
         else {
             // If current game has score box, it renders it
             if (showScoreBox() && showScore()) {
-                graphics.blit(new ResourceLocation(GameDiscsMod.MOD_ID, "textures/gui/score_box.png"), posX, posY, 0, 0, 0, 140, 100, 140, 100);
+                if (useLongScoreBox()) graphics.drawTexture(Identifier.of(GameDiscsMod.MOD_ID, "textures/gui/long_score_box.png"), posX, posY, 0, 0, 0, 140, 100, 140, 100);
+                else graphics.drawTexture(Identifier.of(GameDiscsMod.MOD_ID, "textures/gui/score_box.png"), posX, posY, 0, 0, 0, 140, 100, 140, 100);
             }
 
             if (showScore()) {
                 // Renders score
-                graphics.drawString(
+                graphics.drawText(
                         font,
-                        (scoreText() ? Component.translatable("gui.gamingconsole.score").append(": ") : Component.empty()).append(String.valueOf(score)),
+                        (scoreText() ? Text.translatable("gui.gamingconsole.score").append(": ") : Text.empty()).append(String.valueOf(score)),
                         posX + 2,
                         posY + 2,
                         0x373737,
                         false
                 );
-                graphics.drawString(
+                graphics.drawText(
                         font,
-                        (scoreText() ? Component.translatable("gui.gamingconsole.score").append(": ") : Component.empty()).append(String.valueOf(score)),
+                        (scoreText() ? Text.translatable("gui.gamingconsole.score").append(": ") : Text.empty()).append(String.valueOf(score)),
                         posX + 1,
                         posY + 1,
                         scoreColor(),
@@ -340,7 +382,7 @@ public class Game {
         }
     }
 
-    public synchronized void renderParticles(GuiGraphics graphics, int posX, int posY) {
+    public synchronized void renderParticles(DrawContext graphics, int posX, int posY) {
         for (Particle particle : particles) {
             particle.render(graphics, posX, posY, stage);
         }
@@ -366,31 +408,31 @@ public class Game {
         particles.add(particle);
         return particle;
     }
-    public void spawnParticleExplosion(Supplier<Renderer> renderer, Vec2 pos, int count, int speed, int lifetime, ParticleLevel level) {
+    public void spawnParticleExplosion(Supplier<Renderer> renderer, Vec2f pos, int count, int speed, int lifetime, ParticleLevel level) {
         for (int i = 0; i < count; i++) {
             Particle particle = new Particle(pos, renderer.get(), random.nextInt(lifetime / 2, lifetime), level);
-            particle.setVelocity(new Vec2(random.nextFloat(-speed, speed), random.nextFloat(-speed, speed)));
+            particle.setVelocity(new Vec2f(random.nextFloat(-speed, speed), random.nextFloat(-speed, speed)));
             particles.add(particle);
         }
     }
-    public void spawnParticleExplosion(Vec2 pos, int count, int speed, int lifetime, ParticleLevel level) {
-        soundPlayer.play(SoundEvents.GENERIC_EXPLODE, 1.5f, 0.1f);
+    public void spawnParticleExplosion(Vec2f pos, int count, int speed, int lifetime, ParticleLevel level) {
+        soundPlayer.play(SoundEvents.ENTITY_GENERIC_EXPLODE.value(), 1.5f, 0.1f);
         for (int i = 0; i < count; i++) {
             Particle particle = new ExplosionParticle(pos, random.nextInt(lifetime / 2, lifetime), level);
-            particle.setVelocity(new Vec2(random.nextFloat(-speed, speed), random.nextFloat(-speed, speed)));
+            particle.setVelocity(new Vec2f(random.nextFloat(-speed, speed), random.nextFloat(-speed, speed)));
             particles.add(particle);
         }
     }
 
     public void spawnConfetti() {
         for (int i = 0; i < 30; i++) {
-            Particle particle = new ConfettiParticle(new Vec2(0, HEIGHT), ParticleColor.random(random), random.nextInt(50, 70), ParticleLevel.OVERLAY);
-            particle.setVelocity(new Vec2(random.nextFloat(1, 10), random.nextFloat(-25, -10)));
+            Particle particle = new ConfettiParticle(new Vec2f(0, HEIGHT), ParticleColor.random(random), random.nextInt(50, 70), ParticleLevel.OVERLAY);
+            particle.setVelocity(new Vec2f(random.nextFloat(1, 10), random.nextFloat(-25, -10)));
             particles.add(particle);
         }
         for (int i = 0; i < 30; i++) {
-            Particle particle = new ConfettiParticle(new Vec2(WIDTH, HEIGHT), ParticleColor.random(random), random.nextInt(50, 70), ParticleLevel.OVERLAY);
-            particle.setVelocity(new Vec2(random.nextFloat(-10, -1), random.nextFloat(-25, -10)));
+            Particle particle = new ConfettiParticle(new Vec2f(WIDTH, HEIGHT), ParticleColor.random(random), random.nextInt(50, 70), ParticleLevel.OVERLAY);
+            particle.setVelocity(new Vec2f(random.nextFloat(-10, -1), random.nextFloat(-25, -10)));
             particles.add(particle);
         }
     }
@@ -413,7 +455,7 @@ public class Game {
     /**
      * @return Resource location of background image
      */
-    public ResourceLocation getBackground() {
+    public Identifier getBackground() {
         return null;
     }
 
@@ -424,11 +466,27 @@ public class Game {
         return true;
     }
 
+    public boolean useLongScoreBox() {
+        return false;
+    }
+
     public boolean showScore() {
         return true;
     }
 
     public boolean showPressAnyKey() {
+        return true;
+    }
+
+    public boolean showAiReactInfo() {
+        return false;
+    }
+
+    public boolean showMutiPlayerInfo() {
+        return false;
+    }
+
+    public boolean renderScoreBoard() {
         return true;
     }
 
@@ -449,17 +507,17 @@ public class Game {
     /**
      * @return Display name of the game
      */
-    public Component getName() {return Component.empty();}
+    public Text getName() {return Text.empty();}
 
     /**
      * @return Resource location to icon of the game
      */
-    public ResourceLocation getIcon() {return null;}
+    public Identifier getIcon() {return null;}
 
     /**
      * @return Display color of the game
      */
-    public ChatFormatting getColor() {return ChatFormatting.YELLOW;}
+    public Formatting getColor() {return Formatting.YELLOW;}
 
     /**
      * @return True if the game is an empty game (default Game, not its child), false otherwise

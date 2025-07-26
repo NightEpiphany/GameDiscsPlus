@@ -1,12 +1,12 @@
 package net.tejty.gamediscs.games.gamediscs;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.phys.Vec2;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec2f;
 import net.tejty.gamediscs.GameDiscsMod;
 import net.tejty.gamediscs.games.controls.Button;
 import net.tejty.gamediscs.games.graphics.Image;
@@ -18,11 +18,15 @@ import java.util.List;
 
 public class TntSweeperGame extends Game {
     private final MultiImage TILE = new MultiImage(
-            new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/tnt_sweeper.png"), 6, 84, 14);
-    private static final ResourceLocation SELECT = new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/select.png");
+            Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/tnt_sweeper.png"), 6, 84, 14);
+
+    private final MultiImage TILE2 = new MultiImage(
+            Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/tnt_sweeper2.png"), 6, 84, 14);
+
+    private static final Identifier SELECT = Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/select.png");
 
     // Start position of the actual game field
-    private static final Vec2 GAME_POS = new Vec2(1, 9);
+    private static final Vec2f GAME_POS = new Vec2f(1, 9);
 
     // Size of the tile
     private static final int TILE_SIZE = 6;
@@ -35,10 +39,14 @@ public class TntSweeperGame extends Game {
     private static final int TNT_COUNT = 70;
     private int flags;
 
+    private boolean useGardenTexture = true;
+
+    private static final MinecraftClient mc = MinecraftClient.getInstance();
+
     // List of TNTs
-    private List<Vec2> bombs = new ArrayList<>();
-    private boolean isTntOn(Vec2 pos) {
-        for (Vec2 bomb : bombs) {
+    private List<Vec2f> bombs = new ArrayList<>();
+    private boolean isTntOn(Vec2f pos) {
+        for (Vec2f bomb : bombs) {
             if (VecUtil.is(bomb, pos)) {
                 return true;
             }
@@ -46,9 +54,9 @@ public class TntSweeperGame extends Game {
         return false;
     }
 
-    private int calculateBombsAround(Vec2 pos) {
+    private int calculateBombsAround(Vec2f pos) {
         int count = 0;
-        for (Vec2 rel : VecUtil.RELATIVES) {
+        for (Vec2f rel : VecUtil.RELATIVES) {
             if (isTntOn(pos.add(rel))) {
                 count++;
             }
@@ -57,7 +65,7 @@ public class TntSweeperGame extends Game {
     }
 
     // Game grid
-    private Grid grid = new Grid(GAME_WIDTH, GAME_HEIGHT, TILE_SIZE, TILE);
+    private Grid grid;
 
     // Tile types
     private static final int NOTHING = 0;
@@ -80,8 +88,8 @@ public class TntSweeperGame extends Game {
     }
 
     // Selection sprite
-    private Vec2 selectionPos = VecUtil.round(new Vec2(GAME_WIDTH - 1, GAME_HEIGHT - 1).scale(0.5f));
-    private Sprite selection = new Sprite(calcPos(selectionPos).add(VecUtil.of(-1)), VecUtil.of(TILE_SIZE + 2), new Image(SELECT, 8, 8));
+    private Vec2f selectionPos = VecUtil.round(new Vec2f(GAME_WIDTH - 1, GAME_HEIGHT - 1).multiply(0.5f));
+    private final Sprite selection = new Sprite(calcPos(selectionPos).add(VecUtil.of(-1)), VecUtil.of(TILE_SIZE + 2), new Image(SELECT, 8, 8));
 
     public TntSweeperGame() {
         super();
@@ -90,8 +98,9 @@ public class TntSweeperGame extends Game {
     public synchronized void prepare() {
         // Calls prepare of super
         super.prepare();
+        this.useGardenTexture = !this.useGardenTexture;
+        grid = new Grid(GAME_WIDTH, GAME_HEIGHT, TILE_SIZE, this.useGardenTexture ? TILE2 : TILE);
 
-        grid = new Grid(GAME_WIDTH, GAME_HEIGHT, TILE_SIZE, TILE);
         bombs = new ArrayList<>();
         flags = TNT_COUNT;
     }
@@ -103,14 +112,14 @@ public class TntSweeperGame extends Game {
 
         // Generates TNTs
         for (int i = 0; i < TNT_COUNT; i++) {
-            Vec2 pos = null;
+            Vec2f pos = null;
             while (true) {
                 if (pos != null) {
-                    if (!isTntOn(pos) && Math.sqrt(pos.distanceToSqr(selectionPos)) > 2) {
+                    if (!isTntOn(pos) && Math.sqrt(pos.distanceSquared(selectionPos)) > 2) {
                         break;
                     }
                 }
-                pos = VecUtil.randomInt(Vec2.ZERO, new Vec2(GAME_WIDTH, GAME_HEIGHT), random);
+                pos = VecUtil.randomInt(Vec2f.ZERO, new Vec2f(GAME_WIDTH, GAME_HEIGHT), random);
             }
             bombs.add(pos);
         }
@@ -138,13 +147,13 @@ public class TntSweeperGame extends Game {
             if (controls.isButtonDown(Button.RIGHT) && !controls.wasButtonDown(Button.RIGHT)) {
                 selectionPos = selectionPos.add(VecUtil.VEC_RIGHT);
             }
-            selectionPos = new Vec2(Math.min(Math.max(selectionPos.x, 0), GAME_WIDTH - 1), Math.min(Math.max(selectionPos.y, 0), GAME_HEIGHT - 1));
+            selectionPos = new Vec2f(Math.min(Math.max(selectionPos.x, 0), GAME_WIDTH - 1), Math.min(Math.max(selectionPos.y, 0), GAME_HEIGHT - 1));
             selection.setPos(calcPos(selectionPos).add(VecUtil.of(-1)));
         }
     }
 
     @Override
-    public synchronized void render(GuiGraphics graphics, int posX, int posY) {
+    public synchronized void render(DrawContext graphics, int posX, int posY) {
         // Calls render of super
         super.render(graphics, posX, posY);
 
@@ -159,14 +168,14 @@ public class TntSweeperGame extends Game {
 
         // Renders overlay
         renderOverlay(graphics, posX, posY);
-        Font font = Minecraft.getInstance().font;
+        TextRenderer font = MinecraftClient.getInstance().textRenderer;
         String text = String.valueOf(flags);
-        graphics.drawString(font, text, posX + 2, posY + 2, 0x373737, false);
-        graphics.drawString(font, text, posX + 1, posY + 1, 0xFFFFFF, false);
+        graphics.drawText(font, text, posX + 2, posY + 2, 0x373737, false);
+        graphics.drawText(font, text, posX + 1, posY + 1, 0xFFFFFF, false);
         if (stage == GameStage.PLAYING) {
             text = String.valueOf(ticks / 20);
-            graphics.drawString(font, text, posX + WIDTH - font.width(text) - 1, posY + 2, 0x373737, false);
-            graphics.drawString(font, text, posX + WIDTH - font.width(text) - 2, posY + 1, 0xFFFFFF, false);
+            graphics.drawText(font, text, posX + WIDTH - font.getWidth(text) - 1, posY + 2, 0x373737, false);
+            graphics.drawText(font, text, posX + WIDTH - font.getWidth(text) - 2, posY + 1, 0xFFFFFF, false);
         }
     }
 
@@ -174,16 +183,16 @@ public class TntSweeperGame extends Game {
      * @param pos Position on screen
      * @return Tile position
      */
-    private Vec2 calcTile(Vec2 pos) {
-        return pos.add(GAME_POS.negated()).scale((float) 1 / TILE_SIZE);
+    private Vec2f calcTile(Vec2f pos) {
+        return pos.add(GAME_POS.negate()).multiply((float) 1 / TILE_SIZE);
     }
 
     /**
      * @param tile Tile position
      * @return Position on screen
      */
-    private Vec2 calcPos(Vec2 tile) {
-        return tile.scale(TILE_SIZE).add(GAME_POS);
+    private Vec2f calcPos(Vec2f tile) {
+        return tile.multiply(TILE_SIZE).add(GAME_POS);
     }
 
     @Override
@@ -204,19 +213,19 @@ public class TntSweeperGame extends Game {
             if (button == Button.RIGHT) {
                 selectionPos = selectionPos.add(VecUtil.VEC_RIGHT);
             }
-            selectionPos = new Vec2(Math.min(Math.max(selectionPos.x, 0), GAME_WIDTH - 1), Math.min(Math.max(selectionPos.y, 0), GAME_HEIGHT - 1));
+            selectionPos = new Vec2f(Math.min(Math.max(selectionPos.x, 0), GAME_WIDTH - 1), Math.min(Math.max(selectionPos.y, 0), GAME_HEIGHT - 1));
             selection.setPos(calcPos(selectionPos).add(VecUtil.of(-1)));
             if (button == Button.BUTTON2) {
                 if (grid.get(selectionPos) == NOTHING && flags > 0) {
                     grid.set(selectionPos, FLAG);
                     flags--;
                     checkForWin();
-                    soundPlayer.play(SoundEvents.WOOL_PLACE);
+                    soundPlayer.play(SoundEvents.BLOCK_WOOL_PLACE);
                 }
                 else if (grid.get(selectionPos) == FLAG) {
                     grid.set(selectionPos, NOTHING);
                     flags++;
-                    soundPlayer.play(SoundEvents.WOOL_BREAK);
+                    soundPlayer.play(SoundEvents.BLOCK_WOOL_BREAK);
                 }
             }
         }
@@ -238,7 +247,7 @@ public class TntSweeperGame extends Game {
         }
     }
 
-    private void dig(Vec2 pos) {
+    private void dig(Vec2f pos) {
         if (grid.isIn(pos) && grid.get((int)pos.x, (int)pos.y) == NOTHING) {
             if (isTntOn(pos)) {
                 die();
@@ -246,11 +255,11 @@ public class TntSweeperGame extends Game {
                 score++;
                 grid.set((int) pos.x, (int) pos.y, numberTile(calculateBombsAround(pos)));
                 if (grid.get((int) pos.x, (int) pos.y) == EMPTY) {
-                    for (Vec2 rel : VecUtil.RELATIVES) {
+                    for (Vec2f rel : VecUtil.RELATIVES) {
                         dig(pos.add(rel));
                     }
                 }
-                soundPlayer.play(SoundEvents.DEEPSLATE_BRICKS_BREAK);
+                soundPlayer.play(SoundEvents.BLOCK_DEEPSLATE_BRICKS_BREAK);
                 checkForWin();
             }
         }
@@ -266,7 +275,7 @@ public class TntSweeperGame extends Game {
     public synchronized void die() {
         super.die();
 
-        for (Vec2 bomb : bombs) {
+        for (Vec2f bomb : bombs) {
             grid.set(bomb, TNT);
             spawnParticleExplosion(calcPos(bomb), 10, 2, 20, ParticleLevel.GAME);
         }
@@ -285,15 +294,18 @@ public class TntSweeperGame extends Game {
     }
 
     @Override
-    public ResourceLocation getBackground() {
-        return new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/background/tnt_sweeper_background.png");
+    public Identifier getBackground() {
+        return this.useGardenTexture ? Identifier.of(GameDiscsMod.MOD_ID, "textures/games/background/tnt_sweeper_garden_background.png")
+                : Identifier.of(GameDiscsMod.MOD_ID, "textures/games/background/tnt_sweeper_background.png");
     }
+
     @Override
-    public Component getName() {
-        return Component.translatable("gamediscs.tnt_sweeper");
+    public Text getName() {
+        return Text.translatable("gamediscs.tnt_sweeper");
     }
+
     @Override
-    public ResourceLocation getIcon() {
-        return new ResourceLocation(GameDiscsMod.MOD_ID, "textures/item/game_disc_tnt_sweeper.png");
+    public Identifier getIcon() {
+        return Identifier.of(GameDiscsMod.MOD_ID, "textures/item/game_disc_tnt_sweeper.png");
     }
 }

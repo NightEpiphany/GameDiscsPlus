@@ -1,8 +1,8 @@
 package net.tejty.gamediscs.games.graphics;
 
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.DrawContext;
 
 public class Renderer {
-    public void render(GuiGraphics graphics, int posX, int posY) {
+    public void render(DrawContext graphics, int posX, int posY) {
     }
 }

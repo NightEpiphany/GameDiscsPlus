@@ -1,38 +1,33 @@
 package net.tejty.gamediscs.util.networking;
 
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.NetworkDirection;
-import net.minecraftforge.network.NetworkRegistry;
-import net.minecraftforge.network.PacketDistributor;
-import net.minecraftforge.network.simple.SimpleChannel;
+import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.Identifier;
 import net.tejty.gamediscs.GameDiscsMod;
+import net.tejty.gamediscs.item.custom.GamingConsoleItem;
 import net.tejty.gamediscs.util.networking.packet.SetBestScoreC2SPacket;
+import net.tejty.gamediscs.util.networking.payload.SetBestScoreC2SPayload;
 
 public class ModMessages {
-    private static SimpleChannel INSTANCE;
-    private static int packetId = 0;
-    private static int id() {
-        return packetId++;
+    public static final Identifier SET_BEST_SCORE_ID = Identifier.of(GameDiscsMod.MOD_ID, "set_best_score");
+
+    public static void registerC2SPackets() {
+
+        PayloadTypeRegistry.playC2S().register(SetBestScoreC2SPayload.ID, SetBestScoreC2SPayload.CODEC);
+
+        ServerPlayNetworking.registerGlobalReceiver(SetBestScoreC2SPayload.ID,
+                (client, ctx) -> {
+                    String game = client.game();
+                    int score = client.score();
+                    ItemStack stack = ctx.player().getMainHandStack();
+                    if (stack.getItem() instanceof GamingConsoleItem console) {
+                        console.setBestScore(stack, game, score, ctx.player());
+                    }
+        });
     }
-    public static void register() {
-        SimpleChannel net = NetworkRegistry.ChannelBuilder
-                .named(new ResourceLocation(GameDiscsMod.MOD_ID, "messages"))
-                .networkProtocolVersion(() -> "1.0")
-                .clientAcceptedVersions(s -> true)
-                .serverAcceptedVersions(s -> true)
-                .simpleChannel();
-        INSTANCE = net;
-        net.messageBuilder(SetBestScoreC2SPacket.class, id(), NetworkDirection.PLAY_TO_SERVER)
-                .decoder(SetBestScoreC2SPacket::new)
-                .encoder(SetBestScoreC2SPacket::toBytes)
-                .consumerMainThread(SetBestScoreC2SPacket::handle)
-                .add();
-    }
-    public static <MSG> void sendToServer(MSG message) {
-        INSTANCE.sendToServer(message);
-    }
-    public static <MSG> void sendToPlayer(MSG message, ServerPlayer player) {
-        INSTANCE.send(PacketDistributor.PLAYER.with(() -> player), message);
+
+    public static void registerS2CPackets() {
+
     }
 }

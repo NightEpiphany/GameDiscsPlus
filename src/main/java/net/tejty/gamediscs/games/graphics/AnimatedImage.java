@@ -1,9 +1,8 @@
 package net.tejty.gamediscs.games.graphics;
 
-import net.minecraft.client.renderer.Rect2i;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.util.math.Rect2i;
+import net.minecraft.util.Identifier;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class AnimatedImage extends MultiImage {
@@ -15,12 +14,12 @@ public class AnimatedImage extends MultiImage {
         this.duration = duration;
     }
 
-    public AnimatedImage(ResourceLocation file, int fileWidth, int fileHeight, List<Rect2i> rects, int duration) {
+    public AnimatedImage(Identifier file, int fileWidth, int fileHeight, List<Rect2i> rects, int duration) {
         super(file, fileWidth, fileHeight, rects);
         this.duration = duration;
     }
 
-    public AnimatedImage(ResourceLocation file, int fileWidth, int fileHeight, int frames, int duration) {
+    public AnimatedImage(Identifier file, int fileWidth, int fileHeight, int frames, int duration) {
         this(file, fileWidth, fileHeight, fromFile(fileWidth, fileHeight, frames), duration);
     }
 

@@ -1,62 +1,62 @@
 package net.tejty.gamediscs.item.custom;
 
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.NbtComponent;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
+import net.minecraft.world.World;
+import net.tejty.gamediscs.GameDiscsMod;
 import net.tejty.gamediscs.client.ClientUtils;
 
-import java.util.function.Supplier;
+import java.util.Objects;
 
 public class GamingConsoleItem extends Item {
-    public GamingConsoleItem(Properties properties) {
-        super(properties.stacksTo(1));
+    public GamingConsoleItem(Settings properties) {
+        super(properties.maxCount(1));
     }
 
-    @Override
-    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
-        if (FMLEnvironment.dist == Dist.CLIENT) {
-            if (level.isClientSide()) {
-                ClientUtils.openConsoleScreen();
-            }
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        if (world.isClient()) {
+            ClientUtils.openConsoleScreen();
         }
-        return super.use(level, player, hand);
+
+        return super.use(world, user, hand);
     }
 
-    @FunctionalInterface
-    private interface ScreenSetter {
-        void run(Component title);
-    }
-
-    public void setBestScore(ItemStack stack, String game, int score, Player player) {
-        if (!stack.hasTag()){
-            stack.setTag(new CompoundTag());
+    public void setBestScore(ItemStack stack, String game, int score, PlayerEntity player) {
+//        if (!stack.hasNbt()){
+//            stack.setNbt(new NbtCompound());
+//        }
+//        NbtCompound nbtData = stack.getNbt();
+//        nbtData.putInt(GameDiscsMod.MOD_ID + ":" + game + ";" + player.getDisplayName().getString(), score);
+//        stack.setNbt(nbtData);
+        NbtComponent nbtComponent = stack.get(DataComponentTypes.CUSTOM_DATA);
+        if (nbtComponent == null) {return;}
+        if (!nbtComponent.isEmpty()) {
+            NbtCompound nbtData = new NbtCompound();
+            nbtData.putInt(GameDiscsMod.MOD_ID + ":" + game + ";" + Objects.requireNonNull(player.getDisplayName()).getString(), score);
+            NbtComponent.set(DataComponentTypes.CUSTOM_DATA, stack, nbtData);
+        }else {
+            NbtCompound nbtData = new NbtCompound();
+            NbtComponent.set(DataComponentTypes.CUSTOM_DATA, stack, nbtData);
         }
-        CompoundTag nbtData = stack.getTag();
-        if (nbtData == null) return;
-        nbtData.putInt("gamediscs:" + game + ";" + player.getStringUUID(), score);
-        stack.setTag(nbtData);
 
         // TODO bestScore
     }
 
-    public static int getBestScore(ItemStack stack, String game, Player player) {
-        if (!stack.hasTag()){
+    public static int getBestScore(ItemStack stack, String game, PlayerEntity player) {
+        NbtComponent nbtComponent = stack.get(DataComponentTypes.CUSTOM_DATA);
+        if (nbtComponent == null) {return 0;}
+        if (nbtComponent.isEmpty()) {
             return 0;
         }
         else {
-            CompoundTag nbtData = stack.getTag();
-            if (nbtData != null) {
-                return nbtData.getInt("gamediscs:" + game + ";" + player.getStringUUID());
-            } else {
-                return 0; // default value
-            }
+             return nbtComponent.getNbt().getInt(GameDiscsMod.MOD_ID + ":" + game + ";" + Objects.requireNonNull(player.getDisplayName()).getString());
+            //return nbtComponent..getInt(GameDiscsMod.MOD_ID + ":" + game + ";" + player.getDisplayName().getString());
         }
     }
 }

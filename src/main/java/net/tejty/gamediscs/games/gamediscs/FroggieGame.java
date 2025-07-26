@@ -1,17 +1,15 @@
 package net.tejty.gamediscs.games.gamediscs;
 
-import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.phys.Vec2;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec2f;
 import net.tejty.gamediscs.GameDiscsMod;
 import net.tejty.gamediscs.games.controls.Button;
 import net.tejty.gamediscs.games.graphics.DirectionalImage;
 import net.tejty.gamediscs.games.graphics.Image;
-import net.tejty.gamediscs.games.graphics.Renderer;
 import net.tejty.gamediscs.games.util.Game;
 import net.tejty.gamediscs.games.util.GameStage;
 import net.tejty.gamediscs.games.util.Sprite;
@@ -22,10 +20,10 @@ import java.util.List;
 
 public class FroggieGame extends Game {
     private Sprite frog = new Sprite(
-            new Vec2(0, 0),
-            new Vec2(7, 7),
+            new Vec2f(0, 0),
+            new Vec2f(7, 7),
             new DirectionalImage(
-                    new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/frog.png"),
+                    Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/frog.png"),
                     7,
                     28
             )
@@ -48,12 +46,12 @@ public class FroggieGame extends Game {
 
     private int lastLine = 0;
 
-    private static Vec2 getPos(Vec2 tile) {
-        return tile.scale(TILE_SIZE);
+    private static Vec2f getPos(Vec2f tile) {
+        return tile.multiply(TILE_SIZE);
     }
 
-    private static Vec2 getTile(Vec2 pos) {
-        return VecUtil.round(pos.scale(1f / TILE_SIZE));
+    private static Vec2f getTile(Vec2f pos) {
+        return VecUtil.round(pos.multiply(1f / TILE_SIZE));
     }
 
     public FroggieGame() {
@@ -80,245 +78,245 @@ public class FroggieGame extends Game {
         if (true) {
             minecarts.add(
                     new Sprite(
-                            getPos(new Vec2(20, 12)),
-                            new Vec2(7, 7),
-                            new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
-                    ).addVelocity(new Vec2(-2, 0))
+                            getPos(new Vec2f(20, 12)),
+                            new Vec2f(7, 7),
+                            Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
+                    ).addVelocity(new Vec2f(-2, 0))
             );
             minecarts.add(
                     new Sprite(
-                            getPos(new Vec2(19, 12)),
-                            new Vec2(7, 7),
-                            new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
-                    ).addVelocity(new Vec2(-2, 0))
+                            getPos(new Vec2f(19, 12)),
+                            new Vec2f(7, 7),
+                            Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
+                    ).addVelocity(new Vec2f(-2, 0))
             );
             minecarts.add(
                     new Sprite(
-                            getPos(new Vec2(18, 12)),
-                            new Vec2(7, 7),
-                            new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
-                    ).addVelocity(new Vec2(-2, 0))
+                            getPos(new Vec2f(18, 12)),
+                            new Vec2f(7, 7),
+                            Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
+                    ).addVelocity(new Vec2f(-2, 0))
             );
             minecarts.add(
                     new Sprite(
-                            getPos(new Vec2(12, 12)),
-                            new Vec2(7, 7),
-                            new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
-                    ).addVelocity(new Vec2(-2, 0))
+                            getPos(new Vec2f(12, 12)),
+                            new Vec2f(7, 7),
+                            Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
+                    ).addVelocity(new Vec2f(-2, 0))
             );
             minecarts.add(
                     new Sprite(
-                            getPos(new Vec2(11, 12)),
-                            new Vec2(7, 7),
-                            new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
-                    ).addVelocity(new Vec2(-2, 0))
-            );
-
-
-            minecarts.add(
-                    new Sprite(
-                            getPos(new Vec2(0, 11)),
-                            new Vec2(7, 7),
-                            new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
-                    ).addVelocity(new Vec2(2f, 0))
-            );
-            minecarts.add(
-                    new Sprite(
-                            getPos(new Vec2(10, 11)),
-                            new Vec2(7, 7),
-                            new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
-                    ).addVelocity(new Vec2(2f, 0))
+                            getPos(new Vec2f(11, 12)),
+                            new Vec2f(7, 7),
+                            Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
+                    ).addVelocity(new Vec2f(-2, 0))
             );
 
 
             minecarts.add(
                     new Sprite(
-                            getPos(new Vec2(15, 10)),
-                            new Vec2(7, 7),
-                            new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
-                    ).addVelocity(new Vec2(-4, 0))
+                            getPos(new Vec2f(0, 11)),
+                            new Vec2f(7, 7),
+                            Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
+                    ).addVelocity(new Vec2f(2f, 0))
             );
             minecarts.add(
                     new Sprite(
-                            getPos(new Vec2(16, 10)),
-                            new Vec2(7, 7),
-                            new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
-                    ).addVelocity(new Vec2(-4, 0))
-            );
-            minecarts.add(
-                    new Sprite(
-                            getPos(new Vec2(5, 10)),
-                            new Vec2(7, 7),
-                            new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
-                    ).addVelocity(new Vec2(-4, 0))
-            );
-            minecarts.add(
-                    new Sprite(
-                            getPos(new Vec2(6, 10)),
-                            new Vec2(7, 7),
-                            new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
-                    ).addVelocity(new Vec2(-4, 0))
+                            getPos(new Vec2f(10, 11)),
+                            new Vec2f(7, 7),
+                            Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
+                    ).addVelocity(new Vec2f(2f, 0))
             );
 
 
             minecarts.add(
                     new Sprite(
-                            getPos(new Vec2(13, 9)),
-                            new Vec2(7, 7),
-                            new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
-                    ).addVelocity(new Vec2(6, 0))
+                            getPos(new Vec2f(15, 10)),
+                            new Vec2f(7, 7),
+                            Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
+                    ).addVelocity(new Vec2f(-4, 0))
+            );
+            minecarts.add(
+                    new Sprite(
+                            getPos(new Vec2f(16, 10)),
+                            new Vec2f(7, 7),
+                            Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
+                    ).addVelocity(new Vec2f(-4, 0))
+            );
+            minecarts.add(
+                    new Sprite(
+                            getPos(new Vec2f(5, 10)),
+                            new Vec2f(7, 7),
+                            Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
+                    ).addVelocity(new Vec2f(-4, 0))
+            );
+            minecarts.add(
+                    new Sprite(
+                            getPos(new Vec2f(6, 10)),
+                            new Vec2f(7, 7),
+                            Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
+                    ).addVelocity(new Vec2f(-4, 0))
             );
 
 
             minecarts.add(
                     new Sprite(
-                            getPos(new Vec2(8, 8)),
-                            new Vec2(7, 7),
-                            new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
-                    ).addVelocity(new Vec2(-2, 0))
+                            getPos(new Vec2f(13, 9)),
+                            new Vec2f(7, 7),
+                            Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
+                    ).addVelocity(new Vec2f(6, 0))
+            );
+
+
+            minecarts.add(
+                    new Sprite(
+                            getPos(new Vec2f(8, 8)),
+                            new Vec2f(7, 7),
+                            Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
+                    ).addVelocity(new Vec2f(-2, 0))
             );
             minecarts.add(
                     new Sprite(
-                            getPos(new Vec2(9, 8)),
-                            new Vec2(7, 7),
-                            new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
-                    ).addVelocity(new Vec2(-2, 0))
+                            getPos(new Vec2f(9, 8)),
+                            new Vec2f(7, 7),
+                            Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
+                    ).addVelocity(new Vec2f(-2, 0))
             );
             minecarts.add(
                     new Sprite(
-                            getPos(new Vec2(10, 8)),
-                            new Vec2(7, 7),
-                            new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
-                    ).addVelocity(new Vec2(-2, 0))
+                            getPos(new Vec2f(10, 8)),
+                            new Vec2f(7, 7),
+                            Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
+                    ).addVelocity(new Vec2f(-2, 0))
             );
             minecarts.add(
                     new Sprite(
-                            getPos(new Vec2(16, 8)),
-                            new Vec2(7, 7),
-                            new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
-                    ).addVelocity(new Vec2(-2, 0))
+                            getPos(new Vec2f(16, 8)),
+                            new Vec2f(7, 7),
+                            Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
+                    ).addVelocity(new Vec2f(-2, 0))
             );
             minecarts.add(
                     new Sprite(
-                            getPos(new Vec2(17, 8)),
-                            new Vec2(7, 7),
-                            new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
-                    ).addVelocity(new Vec2(-2, 0))
+                            getPos(new Vec2f(17, 8)),
+                            new Vec2f(7, 7),
+                            Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
+                    ).addVelocity(new Vec2f(-2, 0))
             );
             minecarts.add(
                     new Sprite(
-                            getPos(new Vec2(18, 8)),
-                            new Vec2(7, 7),
-                            new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
-                    ).addVelocity(new Vec2(-2, 0))
+                            getPos(new Vec2f(18, 8)),
+                            new Vec2f(7, 7),
+                            Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/minecart.png")
+                    ).addVelocity(new Vec2f(-2, 0))
             );
 
 
             logs.add(
                     new Sprite(
-                            getPos(new Vec2(1, 5)),
-                            new Vec2(21, 7),
-                            new Image(new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/log.png"), 63, 7, 0, 0, 21, 7)
-                    ).addVelocity(new Vec2(1, 0))
+                            getPos(new Vec2f(1, 5)),
+                            new Vec2f(21, 7),
+                            new Image(Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/log.png"), 63, 7, 0, 0, 21, 7)
+                    ).addVelocity(new Vec2f(1, 0))
             );
             logs.add(
                     new Sprite(
-                            getPos(new Vec2(5, 5)),
-                            new Vec2(21, 7),
-                            new Image(new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/log.png"), 63, 7, 0, 0, 21, 7)
-                    ).addVelocity(new Vec2(1, 0))
+                            getPos(new Vec2f(5, 5)),
+                            new Vec2f(21, 7),
+                            new Image(Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/log.png"), 63, 7, 0, 0, 21, 7)
+                    ).addVelocity(new Vec2f(1, 0))
             );
             logs.add(
                     new Sprite(
-                            getPos(new Vec2(16, 5)),
-                            new Vec2(21, 7),
-                            new Image(new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/log.png"), 63, 7, 0, 0, 21, 7)
-                    ).addVelocity(new Vec2(1, 0))
-            );
-
-
-            logs.add(
-                    new Sprite(
-                            getPos(new Vec2(1, 6)),
-                            new Vec2(14, 7),
-                            new Image(new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/turtles.png"), 28, 7, 0, 0, 14, 7)
-                    ).addVelocity(new Vec2(-1, 0))
-            );
-            logs.add(
-                    new Sprite(
-                            getPos(new Vec2(4, 6)),
-                            new Vec2(14, 7),
-                            new Image(new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/turtles.png"), 28, 7, 0, 0, 14, 7)
-                    ).addVelocity(new Vec2(-1, 0))
-            );
-            logs.add(
-                    new Sprite(
-                            getPos(new Vec2(9, 6)),
-                            new Vec2(14, 7),
-                            new Image(new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/turtles.png"), 28, 7, 0, 0, 14, 7)
-                    ).addVelocity(new Vec2(-1, 0))
-            );
-            logs.add(
-                    new Sprite(
-                            getPos(new Vec2(15, 6)),
-                            new Vec2(14, 7),
-                            new Image(new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/turtles.png"), 28, 7, 0, 0, 14, 7)
-                    ).addVelocity(new Vec2(-1, 0))
+                            getPos(new Vec2f(16, 5)),
+                            new Vec2f(21, 7),
+                            new Image(Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/log.png"), 63, 7, 0, 0, 21, 7)
+                    ).addVelocity(new Vec2f(1, 0))
             );
 
 
             logs.add(
                     new Sprite(
-                            getPos(new Vec2(2, 4)),
-                            new Vec2(63, 7),
-                            new Image(new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/log.png"), 63, 7, 0, 0, 63, 7)
-                    ).addVelocity(new Vec2(2, 0))
+                            getPos(new Vec2f(1, 6)),
+                            new Vec2f(14, 7),
+                            new Image(Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/turtles.png"), 28, 7, 0, 0, 14, 7)
+                    ).addVelocity(new Vec2f(-1, 0))
+            );
+            logs.add(
+                    new Sprite(
+                            getPos(new Vec2f(4, 6)),
+                            new Vec2f(14, 7),
+                            new Image(Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/turtles.png"), 28, 7, 0, 0, 14, 7)
+                    ).addVelocity(new Vec2f(-1, 0))
+            );
+            logs.add(
+                    new Sprite(
+                            getPos(new Vec2f(9, 6)),
+                            new Vec2f(14, 7),
+                            new Image(Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/turtles.png"), 28, 7, 0, 0, 14, 7)
+                    ).addVelocity(new Vec2f(-1, 0))
+            );
+            logs.add(
+                    new Sprite(
+                            getPos(new Vec2f(15, 6)),
+                            new Vec2f(14, 7),
+                            new Image(Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/turtles.png"), 28, 7, 0, 0, 14, 7)
+                    ).addVelocity(new Vec2f(-1, 0))
             );
 
 
             logs.add(
                     new Sprite(
-                            getPos(new Vec2(3, 3)),
-                            new Vec2(28, 7),
-                            new Image(new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/turtles.png"), 28, 7, 0, 0, 28, 7)
-                    ).addVelocity(new Vec2(-2, 0))
-            );
-            logs.add(
-                    new Sprite(
-                            getPos(new Vec2(9, 3)),
-                            new Vec2(28, 7),
-                            new Image(new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/turtles.png"), 28, 7, 0, 0, 28, 7)
-                    ).addVelocity(new Vec2(-2, 0))
-            );
-            logs.add(
-                    new Sprite(
-                            getPos(new Vec2(15, 3)),
-                            new Vec2(28, 7),
-                            new Image(new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/turtles.png"), 28, 7, 0, 0, 28, 7)
-                    ).addVelocity(new Vec2(-2, 0))
+                            getPos(new Vec2f(2, 4)),
+                            new Vec2f(63, 7),
+                            new Image(Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/log.png"), 63, 7, 0, 0, 63, 7)
+                    ).addVelocity(new Vec2f(2, 0))
             );
 
 
             logs.add(
                     new Sprite(
-                            getPos(new Vec2(1, 2)),
-                            new Vec2(35, 7),
-                            new Image(new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/log.png"), 63, 7, 0, 0, 35, 7)
-                    ).addVelocity(new Vec2(2, 0))
+                            getPos(new Vec2f(3, 3)),
+                            new Vec2f(28, 7),
+                            new Image(Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/turtles.png"), 28, 7, 0, 0, 28, 7)
+                    ).addVelocity(new Vec2f(-2, 0))
             );
             logs.add(
                     new Sprite(
-                            getPos(new Vec2(8, 2)),
-                            new Vec2(35, 7),
-                            new Image(new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/log.png"), 63, 7, 0, 0, 35, 7)
-                    ).addVelocity(new Vec2(2, 0))
+                            getPos(new Vec2f(9, 3)),
+                            new Vec2f(28, 7),
+                            new Image(Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/turtles.png"), 28, 7, 0, 0, 28, 7)
+                    ).addVelocity(new Vec2f(-2, 0))
             );
             logs.add(
                     new Sprite(
-                            getPos(new Vec2(14, 2)),
-                            new Vec2(35, 7),
-                            new Image(new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/log.png"), 63, 7, 0, 0, 35, 7)
-                    ).addVelocity(new Vec2(2, 0))
+                            getPos(new Vec2f(15, 3)),
+                            new Vec2f(28, 7),
+                            new Image(Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/turtles.png"), 28, 7, 0, 0, 28, 7)
+                    ).addVelocity(new Vec2f(-2, 0))
+            );
+
+
+            logs.add(
+                    new Sprite(
+                            getPos(new Vec2f(1, 2)),
+                            new Vec2f(35, 7),
+                            new Image(Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/log.png"), 63, 7, 0, 0, 35, 7)
+                    ).addVelocity(new Vec2f(2, 0))
+            );
+            logs.add(
+                    new Sprite(
+                            getPos(new Vec2f(8, 2)),
+                            new Vec2f(35, 7),
+                            new Image(Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/log.png"), 63, 7, 0, 0, 35, 7)
+                    ).addVelocity(new Vec2f(2, 0))
+            );
+            logs.add(
+                    new Sprite(
+                            getPos(new Vec2f(14, 2)),
+                            new Vec2f(35, 7),
+                            new Image(Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/log.png"), 63, 7, 0, 0, 35, 7)
+                    ).addVelocity(new Vec2f(2, 0))
             );
         }
     }
@@ -327,9 +325,9 @@ public class FroggieGame extends Game {
     public synchronized void respawn() {
         super.respawn();
 
-        frog.setPos(new Vec2(WIDTH / 2 - TILE_SIZE / 2, 13 * TILE_SIZE));
+        frog.setPos(new Vec2f((float) WIDTH / 2 - (float) TILE_SIZE / 2, 13 * TILE_SIZE));
         frog.setImage(new DirectionalImage(
-                new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/frog.png"),
+                Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/frog.png"),
                 7,
                 28
         ));
@@ -367,7 +365,7 @@ public class FroggieGame extends Game {
             int newX = (int)minecart.getX();
             if (oldX > 0 && newX <= 0) {
                 minecarts.add(
-                        new Sprite(new Vec2(WIDTH, minecart.getY()), minecart.getSize(), minecart.getImage()).addVelocity(minecart.getVelocity())
+                        new Sprite(new Vec2f(WIDTH, minecart.getY()), minecart.getSize(), minecart.getImage()).addVelocity(minecart.getVelocity())
                 );
             }
             if (newX + minecart.getWidth() < 0) {
@@ -376,7 +374,7 @@ public class FroggieGame extends Game {
             }
             if (oldX + minecart.getWidth() < WIDTH && newX + minecart.getWidth() >= WIDTH) {
                 minecarts.add(
-                        new Sprite(new Vec2(0 - minecart.getWidth(), minecart.getY()), minecart.getSize(), minecart.getImage()).addVelocity(minecart.getVelocity())
+                        new Sprite(new Vec2f(0 - minecart.getWidth(), minecart.getY()), minecart.getSize(), minecart.getImage()).addVelocity(minecart.getVelocity())
                 );
             }
             if (newX > WIDTH) {
@@ -401,7 +399,7 @@ public class FroggieGame extends Game {
             int newX = (int)log.getX();
             if (oldX > 0 && newX <= 0) {
                 logs.add(
-                        new Sprite(new Vec2(WIDTH, log.getY()), log.getSize(), log.getImage()).addVelocity(log.getVelocity())
+                        new Sprite(new Vec2f(WIDTH, log.getY()), log.getSize(), log.getImage()).addVelocity(log.getVelocity())
                 );
             }
             if (newX + log.getWidth() < 0) {
@@ -410,7 +408,7 @@ public class FroggieGame extends Game {
             }
             if (oldX + log.getWidth() < WIDTH && newX + log.getWidth() >= WIDTH) {
                 logs.add(
-                        new Sprite(new Vec2(0 - log.getWidth(), log.getY()), log.getSize(), log.getImage()).addVelocity(log.getVelocity())
+                        new Sprite(new Vec2f(0 - log.getWidth(), log.getY()), log.getSize(), log.getImage()).addVelocity(log.getVelocity())
                 );
             }
             if (newX > WIDTH) {
@@ -418,7 +416,7 @@ public class FroggieGame extends Game {
                 i--;
             }
 
-            Vec2 frogPos = frog.getCenterPos();
+            Vec2f frogPos = frog.getCenterPos();
             if (frogPos.x > log.getX() && frogPos.y > log.getY() && frogPos.x < log.getX() + log.getWidth() && frogPos.y < log.getY() + log.getHeight()) {
                 logOn = log;
             }
@@ -436,7 +434,7 @@ public class FroggieGame extends Game {
             }
         }
 
-        Vec2 frogPos = frog.getCenterPos();
+        Vec2f frogPos = frog.getCenterPos();
         if (frogPos.x > WIDTH || frogPos.x < 0 || frogPos.y > HEIGHT || frogPos.y < 0) {
             lostLife();
         }
@@ -494,7 +492,7 @@ public class FroggieGame extends Game {
     }
 
     @Override
-    public synchronized void render(GuiGraphics graphics, int posX, int posY) {
+    public synchronized void render(DrawContext graphics, int posX, int posY) {
         // Calls render of super
         super.render(graphics, posX, posY);
 
@@ -507,7 +505,7 @@ public class FroggieGame extends Game {
         }
 
         frog.render(graphics, posX, posY);
-        Vec2 frogPos = frog.getPos();
+        Vec2f frogPos = frog.getPos();
         int image = 0;
         if (frog.getImage() instanceof DirectionalImage direcional) {
             image = direcional.current();
@@ -515,7 +513,7 @@ public class FroggieGame extends Game {
 
         for (int i = 0; i < holes.size(); i++) {
             if (isHoleFull.get(i)) {
-                frog.setPos(getPos(new Vec2(holes.get(i) - 0.5f, 1)));
+                frog.setPos(getPos(new Vec2f(holes.get(i) - 0.5f, 1)));
                 if (frog.getImage() instanceof DirectionalImage direcional) {
                     direcional.setImage(2);
                 }
@@ -531,8 +529,8 @@ public class FroggieGame extends Game {
         // Renders particles
         renderParticles(graphics, posX, posY);
 
-        Font font = Minecraft.getInstance().font;
-        graphics.drawString(font, Component.literal(String.valueOf(score)),  posX + 2, posY + HEIGHT - font.lineHeight, 0xFFFFFF, true);
+        TextRenderer font = MinecraftClient.getInstance().textRenderer;
+        graphics.drawText(font, Text.literal(String.valueOf(score)),  posX + 2, posY + HEIGHT - font.fontHeight, 0xFFFFFF, true);
 
         // Renders overlay
         renderOverlay(graphics, posX, posY);
@@ -546,7 +544,7 @@ public class FroggieGame extends Game {
         if (stage == GameStage.PLAYING && ticks > 5) {
             if (moveCooldown >= 2) {
                 if (button == Button.UP) {
-                    frog.moveBy(VecUtil.VEC_UP.scale(TILE_SIZE));
+                    frog.moveBy(VecUtil.VEC_UP.multiply(TILE_SIZE));
                     if (frog.getImage() instanceof DirectionalImage image) {
                         image.setImage(0);
                     }
@@ -558,7 +556,7 @@ public class FroggieGame extends Game {
                     soundPlayer.playJump();
                 }
                 if (button == Button.RIGHT) {
-                    frog.moveBy(VecUtil.VEC_RIGHT.scale(TILE_SIZE));
+                    frog.moveBy(VecUtil.VEC_RIGHT.multiply(TILE_SIZE));
                     if (frog.getImage() instanceof DirectionalImage image) {
                         image.setImage(1);
                     }
@@ -566,7 +564,7 @@ public class FroggieGame extends Game {
                     soundPlayer.playJump();
                 }
                 if (button == Button.DOWN) {
-                    frog.moveBy(VecUtil.VEC_DOWN.scale(TILE_SIZE));
+                    frog.moveBy(VecUtil.VEC_DOWN.multiply(TILE_SIZE));
                     if (frog.getImage() instanceof DirectionalImage image) {
                         image.setImage(2);
                     }
@@ -574,7 +572,7 @@ public class FroggieGame extends Game {
                     soundPlayer.playJump();
                 }
                 if (button == Button.LEFT) {
-                    frog.moveBy(VecUtil.VEC_LEFT.scale(TILE_SIZE));
+                    frog.moveBy(VecUtil.VEC_LEFT.multiply(TILE_SIZE));
                     if (frog.getImage() instanceof DirectionalImage image) {
                         image.setImage(3);
                     }
@@ -585,22 +583,22 @@ public class FroggieGame extends Game {
         }
     }
     @Override
-    public ResourceLocation getBackground() {
+    public Identifier getBackground() {
         // Change here:
-        return new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/background/froggie_background.png");
+        return Identifier.of(GameDiscsMod.MOD_ID, "textures/games/background/froggie_background.png");
     }
     @Override
     public boolean showScore() {
         return false;
     }
     @Override
-    public Component getName() {
+    public Text getName() {
         // Change to name of your game
-        return Component.translatable("gamediscs.froggie");
+        return Text.translatable("gamediscs.froggie");
     }
     @Override
-    public ResourceLocation getIcon() {
+    public Identifier getIcon() {
         // Change icon here:
-        return new ResourceLocation(GameDiscsMod.MOD_ID, "textures/item/game_disc_froggie.png");
+        return Identifier.of(GameDiscsMod.MOD_ID, "textures/item/game_disc_froggie.png");
     }
 }

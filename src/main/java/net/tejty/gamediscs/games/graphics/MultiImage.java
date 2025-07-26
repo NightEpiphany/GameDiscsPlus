@@ -1,8 +1,8 @@
 package net.tejty.gamediscs.games.graphics;
 
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.renderer.Rect2i;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.util.math.Rect2i;
+import net.minecraft.util.Identifier;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,12 +15,12 @@ public class MultiImage extends Renderer {
         this.images = images;
     }
 
-    public MultiImage(ResourceLocation file, int fileWidth, int fileHeight, List<Rect2i> rects) {
+    public MultiImage(Identifier file, int fileWidth, int fileHeight, List<Rect2i> rects) {
         for (Rect2i rect : rects) {
             images.add(new Image(file, fileWidth, fileHeight, rect.getX(), rect.getY(), rect.getWidth(), rect.getHeight()));
         }
     }
-    public MultiImage(ResourceLocation file, int fileWidth, int fileHeight, int count) {
+    public MultiImage(Identifier file, int fileWidth, int fileHeight, int count) {
         this(file, fileWidth, fileHeight, fromFile(fileWidth, fileHeight, count));
     }
 
@@ -45,7 +45,7 @@ public class MultiImage extends Renderer {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int posX, int posY) {
+    public void render(DrawContext graphics, int posX, int posY) {
         if (count() > 0) {
             images.get(current).render(graphics, posX, posY);
         }

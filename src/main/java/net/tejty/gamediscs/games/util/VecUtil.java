@@ -1,7 +1,6 @@
 package net.tejty.gamediscs.games.util;
 
-import net.minecraft.world.phys.Vec2;
-import org.joml.Matrix2d;
+import net.minecraft.util.math.Vec2f;
 
 import java.util.List;
 import java.util.Random;
@@ -12,28 +11,28 @@ public class VecUtil {
     public static int DOWN = 2;
     public static int LEFT = 3;
 
-    // Direction constants as relative Vec2
-    public static Vec2 VEC_UP = new Vec2(0, -1);
-    public static Vec2 VEC_RIGHT = new Vec2(1, 0);
-    public static Vec2 VEC_DOWN = new Vec2(0, 1);
-    public static Vec2 VEC_LEFT = new Vec2(-1, 0);
-    public static final List<Vec2> RELATIVES = List.of(
-            new Vec2(-1, -1),
-            new Vec2(0, -1),
-            new Vec2(1, -1),
-            new Vec2(1, 0),
-            new Vec2(1, 1),
-            new Vec2(0, 1),
-            new Vec2(-1, 1),
-            new Vec2(-1, 0)
+    // Direction constants as relative Vec2f
+    public static Vec2f VEC_UP = new Vec2f(0, -1);
+    public static Vec2f VEC_RIGHT = new Vec2f(1, 0);
+    public static Vec2f VEC_DOWN = new Vec2f(0, 1);
+    public static Vec2f VEC_LEFT = new Vec2f(-1, 0);
+    public static final List<Vec2f> RELATIVES = List.of(
+            new Vec2f(-1, -1),
+            new Vec2f(0, -1),
+            new Vec2f(1, -1),
+            new Vec2f(1, 0),
+            new Vec2f(1, 1),
+            new Vec2f(0, 1),
+            new Vec2f(-1, 1),
+            new Vec2f(-1, 0)
     );
 
     /**
      * @param xy X and Y
-     * @return Vec2 made of xy, and xy
+     * @return Vec2f made of xy, and xy
      */
-    public static Vec2 of(float xy) {
-        return new Vec2(xy, xy);
+    public static Vec2f of(float xy) {
+        return new Vec2f(xy, xy);
     }
 
     /**
@@ -41,10 +40,10 @@ public class VecUtil {
      * @param pos1 Position 1
      * @param pos2 Position 2
      * @return Integer of four directional directions
-     * @see VecUtil#getFrom(int) for transfering four dir. direction into relative Vec2
+     * @see VecUtil#getFrom(int) for transfering four dir. direction into relative Vec2f
      */
-    public static int get4DirectionTo(Vec2 pos1, Vec2 pos2) {
-        Vec2 pos = pos2.add(pos1.negated());
+    public static int get4DirectionTo(Vec2f pos1, Vec2f pos2) {
+        Vec2f pos = pos2.add(pos1.negate());
         return get4Direction(pos);
     }
 
@@ -52,9 +51,9 @@ public class VecUtil {
      * Get four directional direction
      * @param pos Position of the direction measuring
      * @return Integer of four directional directions
-     * @see VecUtil#getFrom(int) for transfering four dir. direction into relative Vec2
+     * @see VecUtil#getFrom(int) for transfering four dir. direction into relative Vec2f
      */
-    public static int get4Direction(Vec2 pos) {
+    public static int get4Direction(Vec2f pos) {
         if (pos.x > pos.y) {
             if (pos.x + pos.y > 0) {
                 return RIGHT;
@@ -75,49 +74,49 @@ public class VecUtil {
 
     /**
      * @param direction Integer value of four directional direction
-     * @return Vec2 relative direction
+     * @return Vec2f relative direction
      */
-    public static Vec2 getFrom(int direction) {
+    public static Vec2f getFrom(int direction) {
         return switch (direction) {
             case 0 -> VEC_UP;
             case 1 -> VEC_RIGHT;
             case 2 -> VEC_DOWN;
             case 3 -> VEC_LEFT;
-            default -> Vec2.ZERO;
+            default -> Vec2f.ZERO;
         };
     }
 
     /**
      * @return True if pos1 is the same as pos2, false otherwise
      */
-    public static boolean is(Vec2 pos1, Vec2 pos2) {
+    public static boolean is(Vec2f pos1, Vec2f pos2) {
         return (pos1.x == pos2.x && pos1.y == pos2.y);
     }
 
     /**
-     * @param min Minimal Vec2
-     * @param max Maximal Vec2
+     * @param min Minimal Vec2f
+     * @param max Maximal Vec2f
      * @param random Random generator
-     * @return Random Vec2 Integer position within the range of min and max
+     * @return Random Vec2f Integer position within the range of min and max
      */
-    public static Vec2 randomInt(Vec2 min, Vec2 max, Random random) {
-        return new Vec2(random.nextInt((int)min.x, (int)max.x), random.nextInt((int)min.y, (int)max.y));
+    public static Vec2f randomInt(Vec2f min, Vec2f max, Random random) {
+        return new Vec2f(random.nextInt((int)min.x, (int)max.x), random.nextInt((int)min.y, (int)max.y));
     }
 
     /**
-     * @param min Minimal Vec2
-     * @param max Maximal Vec2
+     * @param min Minimal Vec2f
+     * @param max Maximal Vec2f
      * @param random Random generator
-     * @return Random Vec2 float position within the range of min and max
+     * @return Random Vec2f float position within the range of min and max
      */
-    public static Vec2 randomFloat(Vec2 min, Vec2 max, Random random) {
-        return new Vec2(random.nextFloat(min.x, max.x), random.nextFloat(min.y, max.y));
+    public static Vec2f randomFloat(Vec2f min, Vec2f max, Random random) {
+        return new Vec2f(random.nextFloat(min.x, max.x), random.nextFloat(min.y, max.y));
     }
 
     /**
      * @return Rounded vector
      */
-    public static Vec2 round(Vec2 vec) {
-        return new Vec2(Math.round(vec.x), Math.round(vec.y));
+    public static Vec2f round(Vec2f vec) {
+        return new Vec2f(Math.round(vec.x), Math.round(vec.y));
     }
 }

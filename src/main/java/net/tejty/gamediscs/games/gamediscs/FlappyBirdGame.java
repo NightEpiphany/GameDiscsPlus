@@ -1,34 +1,31 @@
 package net.tejty.gamediscs.games.gamediscs;
 
-import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.phys.Vec2;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec2f;
 import net.tejty.gamediscs.GameDiscsMod;
+import net.tejty.gamediscs.games.controls.Button;
 import net.tejty.gamediscs.games.graphics.AnimatedImage;
 import net.tejty.gamediscs.games.graphics.BreakParticleRenderer;
 import net.tejty.gamediscs.games.graphics.ParticleColor;
 import net.tejty.gamediscs.games.util.*;
-import net.tejty.gamediscs.games.controls.Button;
 
 import java.util.ArrayList;
 import java.util.List;
-
 public class FlappyBirdGame extends Game {
     // The main player Sprite
-    private Sprite bird = new Sprite(new Vec2(20, 30), new Vec2(10, 8),
+    private Sprite bird = new Sprite(new Vec2f(20, 30), new Vec2f(10, 8),
             new AnimatedImage(
-                    new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/bird.png"),
+                    Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/bird.png"),
                     10, 32, 4, 2)
     );
     // List of pipes
     private List<Sprite> pipes = new ArrayList<Sprite>();
     // Ground Sprite
-    private final Sprite ground = new Sprite(new Vec2(0, HEIGHT - 16), new Vec2(156, 16),
-            new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/ground.png"));
+    private final Sprite ground = new Sprite(new Vec2f(0, HEIGHT - 16), new Vec2f(156, 16),
+            Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/ground.png"));
 
     // Countdown of spawning another pillar
     private int pipeSpawnTimer = 0;
@@ -43,13 +40,13 @@ public class FlappyBirdGame extends Game {
         super.prepare();
 
         // Resets everything
-        bird = new Sprite(new Vec2(20, 30), new Vec2(10, 8),
+        bird = new Sprite(new Vec2f(20, 30), new Vec2f(10, 8),
                 new AnimatedImage(
-                        new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/bird.png"),
+                        Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/bird.png"),
                         10, 32, 4, 2)
         );
         pipes = new ArrayList<>();
-        ground.setVelocity(new Vec2(-2.5f, 0));
+        ground.setVelocity(new Vec2f(-2.5f, 0));
         bird.show();
     }
 
@@ -75,7 +72,7 @@ public class FlappyBirdGame extends Game {
         if (stage != GameStage.DIED && stage != GameStage.WON) {
             ground.tick();
             if (ground.getX() <= -16) {
-                ground.moveBy(new Vec2(16, 0));
+                ground.moveBy(new Vec2f(16, 0));
             }
         }
     }
@@ -88,10 +85,10 @@ public class FlappyBirdGame extends Game {
         bird.tick();
 
         // Adds velocity down to the bird (gravity)
-        bird.addVelocity(new Vec2(0, 0.75f));
+        bird.addVelocity(new Vec2f(0, 0.75f));
 
         // Makes air friction to the bird
-        bird.setVelocity(bird.getVelocity().scale(0.9f));
+        bird.setVelocity(bird.getVelocity().multiply(0.9f));
 
         // Spawns a pipe at the right time
         if (pipeSpawnTimer <= 0) {
@@ -140,7 +137,7 @@ public class FlappyBirdGame extends Game {
         }
 
         if (ticks % 2 == 0) {
-            addParticle(new Particle(bird.getCenterPos(), ParticleColor.WHITE, 9, ParticleLevel.RUNNING_GAME)).setVelocity(new Vec2(-2.5f, 0));
+            addParticle(new Particle(bird.getCenterPos(), ParticleColor.WHITE, 9, ParticleLevel.RUNNING_GAME)).setVelocity(new Vec2f(-2.5f, 0));
         }
 
         // Counting down the pipe spawning
@@ -152,7 +149,7 @@ public class FlappyBirdGame extends Game {
         super.die();
         bird.hide();
         spawnParticleExplosion(
-                () -> new BreakParticleRenderer(new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/bird.png"), 10, 32),
+                () -> new BreakParticleRenderer(Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/bird.png"), 10, 32),
                 bird.getCenterPos(),
                 20,
                 2,
@@ -172,13 +169,13 @@ public class FlappyBirdGame extends Game {
         int hole = random.nextInt(5, HEIGHT - holeSize - 21);
 
         // Adds one top pipe and one bottom pipe, on their corresponding positions, and adds them velocity to the left
-        pipes.add(new Sprite(new Vec2(WIDTH, (float)hole - 64f), new Vec2(16f, 64f), new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/pipe_top.png")));
-        pipes.get(pipes.size() - 1).setVelocity(new Vec2(-2.5f, 0f));
-        pipes.add(new Sprite(new Vec2(WIDTH, (float)hole + holeSize), new Vec2(16f, 64f), new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/pipe_bottom.png")));
-        pipes.get(pipes.size() - 1).setVelocity(new Vec2(-2.5f, 0f));
+        pipes.add(new Sprite(new Vec2f(WIDTH, (float)hole - 64f), new Vec2f(16f, 64f), Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/pipe_top.png")));
+        pipes.get(pipes.size() - 1).setVelocity(new Vec2f(-2.5f, 0f));
+        pipes.add(new Sprite(new Vec2f(WIDTH, (float)hole + holeSize), new Vec2f(16f, 64f), Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/pipe_bottom.png")));
+        pipes.get(pipes.size() - 1).setVelocity(new Vec2f(-2.5f, 0f));
     }
     @Override
-    public synchronized void render(GuiGraphics graphics, int posX, int posY) {
+    public synchronized void render(DrawContext graphics, int posX, int posY) {
         // Calls render of super
         super.render(graphics, posX, posY);
 
@@ -208,15 +205,15 @@ public class FlappyBirdGame extends Game {
 
         // If an action button was pressed, bird sets velocity to up (jumps)
         if (button.isActionButton()) {
-            bird.setVelocity(new Vec2(0, -4.5f));
+            bird.setVelocity(new Vec2f(0, -4.5f));
             if (stage == GameStage.PLAYING) {
                 soundPlayer.playJump();
             }
         }
     }
     @Override
-    public ResourceLocation getBackground() {
-        return new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/background/flappy_bird_background.png");
+    public Identifier getBackground() {
+        return Identifier.of(GameDiscsMod.MOD_ID, "textures/games/background/flappy_bird_background.png");
     }
     @Override
     public boolean showScoreBox() {
@@ -224,14 +221,14 @@ public class FlappyBirdGame extends Game {
     }
     @Override
     public int scoreColor() {
-        return ChatFormatting.YELLOW.getColor();
+        return Formatting.YELLOW.getColorValue();
     }
     @Override
-    public Component getName() {
-        return Component.translatable("gamediscs.flappy_bird");
+    public Text getName() {
+        return Text.translatable("gamediscs.flappy_bird");
     }
     @Override
-    public ResourceLocation getIcon() {
-        return new ResourceLocation(GameDiscsMod.MOD_ID, "textures/item/game_disc_flappy_bird.png");
+    public Identifier getIcon() {
+        return Identifier.of(GameDiscsMod.MOD_ID, "textures/item/game_disc_flappy_bird.png");
     }
 }

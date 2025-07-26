@@ -1,10 +1,10 @@
 package net.tejty.gamediscs.client.screen;
 
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.util.Identifier;
 
 public record VisualButton(
-        ResourceLocation image,
+        Identifier image,
         int imageWidth,
         int imageHeight,
         int x,
@@ -15,8 +15,8 @@ public record VisualButton(
         int sourceY,
         int shift
 ) {
-    public void render(GuiGraphics graphics, int x, int y, boolean pressed) {
-        graphics.blit(image, x + this.x, y + this.y, 0, sourceX, pressed ? this.shift + sourceY : sourceY, width, height, imageWidth, imageHeight);
+    public void render(DrawContext graphics, int x, int y, boolean pressed) {
+        graphics.drawTexture(image, x + this.x, y + this.y, 0, sourceX, pressed ? this.shift + sourceY : sourceY, width, height, imageWidth, imageHeight);
     }
 }
 

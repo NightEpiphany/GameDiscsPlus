@@ -1,7 +1,7 @@
 package net.tejty.gamediscs.games.util;
 
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.world.phys.Vec2;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.util.math.Vec2f;
 import net.tejty.gamediscs.games.graphics.Image;
 import net.tejty.gamediscs.games.graphics.MultiImage;
 
@@ -10,7 +10,7 @@ import java.util.List;
 public class Grid {
     private final int[][] map;
     private final int size;
-    private MultiImage images;
+    private final MultiImage images;
 
     public Grid(int width, int height, int tileSize, MultiImage images) {
         map = new int[width][height];
@@ -35,14 +35,14 @@ public class Grid {
         return map[0].length;
     }
 
-    public int get(Vec2 pos) {
+    public int get(Vec2f pos) {
         return map[(int)pos.x][(int)pos.y];
     }
     public int get(int x, int y) {
         return map[x][y];
     }
 
-    public void set(Vec2 pos, int value) {
+    public void set(Vec2f pos, int value) {
         map[(int)pos.x][(int)pos.y] = value;
     }
     public void set(int x, int y, int value) {
@@ -53,7 +53,7 @@ public class Grid {
         return images;
     }
 
-    public void render(GuiGraphics graphics, int posX, int posY) {
+    public void render(DrawContext graphics, int posX, int posY) {
         for (int x = 0; x < map.length; x++) {
             for (int y = 0; y < map[x].length; y++) {
                 renderTile(graphics, posX, posY, x, y);
@@ -61,11 +61,11 @@ public class Grid {
         }
     }
 
-    public boolean isIn(Vec2 pos) {
+    public boolean isIn(Vec2f pos) {
         return pos.x >= 0 && pos.y >= 0 && pos.x < width() && pos.y < height();
     }
 
-    private void renderTile(GuiGraphics graphics, int posX, int posY, int x, int y) {
+    private void renderTile(DrawContext graphics, int posX, int posY, int x, int y) {
         images.setImage(map[x][y]);
         images.render(graphics, posX + x * size, posY + y * size);
     }

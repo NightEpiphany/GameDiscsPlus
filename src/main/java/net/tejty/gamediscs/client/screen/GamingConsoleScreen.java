@@ -1,32 +1,26 @@
 package net.tejty.gamediscs.client.screen;
 
-import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import net.tejty.gamediscs.GameDiscsMod;
 import net.tejty.gamediscs.client.ClientUtils;
-import net.tejty.gamediscs.games.util.Game;
 import net.tejty.gamediscs.games.controls.Button;
+import net.tejty.gamediscs.games.util.Game;
 import net.tejty.gamediscs.item.custom.GameDiscItem;
-import net.tejty.gamediscs.util.time.MillisecondTimer;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@OnlyIn(Dist.CLIENT)
 public class GamingConsoleScreen extends Screen {
-    private static final ResourceLocation BACKGROUD = new ResourceLocation(GameDiscsMod.MOD_ID, "textures/gui/gaming_console.png");
+    private static final Identifier BACKGROUND = Identifier.of(GameDiscsMod.MOD_ID, "textures/gui/gaming_console.png");
     private static final int CONSOLE_WIDTH = 160;
     private static final int CONSOLE_HEIGHT = 198;
 
@@ -44,12 +38,12 @@ public class GamingConsoleScreen extends Screen {
     private static final int ENTER = 257;
 
     // Visual buttons that allow you to visually see if the button is pressed or not
-    private static final VisualButton W_BUTTON = new VisualButton(BACKGROUD, 256, 256, 33, 121, 14, 24, 183, 0, 24);
-    private static final VisualButton A_BUTTON = new VisualButton(BACKGROUD, 256, 256, 17, 137, 23, 15, 160, 0, 24);
-    private static final VisualButton D_BUTTON = new VisualButton(BACKGROUD, 256, 256, 40, 137, 23, 15, 197, 0, 24);
-    private static final VisualButton S_BUTTON = new VisualButton(BACKGROUD, 256, 256, 33, 145, 14, 23, 220, 0, 24);
-    private static final VisualButton B1_BUTTON = new VisualButton(BACKGROUD, 256, 256, 96, 136, 16, 16, 234, 0, 24);
-    private static final VisualButton B2_BUTTON = new VisualButton(BACKGROUD, 256, 256, 128, 128, 16, 16, 234, 0, 24);
+    private static final VisualButton W_BUTTON = new VisualButton(BACKGROUND, 256, 256, 33, 121, 14, 24, 183, 0, 24);
+    private static final VisualButton A_BUTTON = new VisualButton(BACKGROUND, 256, 256, 17, 137, 23, 15, 160, 0, 24);
+    private static final VisualButton D_BUTTON = new VisualButton(BACKGROUND, 256, 256, 40, 137, 23, 15, 197, 0, 24);
+    private static final VisualButton S_BUTTON = new VisualButton(BACKGROUND, 256, 256, 33, 145, 14, 23, 220, 0, 24);
+    private static final VisualButton B1_BUTTON = new VisualButton(BACKGROUND, 256, 256, 96, 136, 16, 16, 234, 0, 24);
+    private static final VisualButton B2_BUTTON = new VisualButton(BACKGROUND, 256, 256, 128, 128, 16, 16, 234, 0, 24);
 
     // Calculates position of the console on screen
     private int getConsoleX() {
@@ -68,7 +62,7 @@ public class GamingConsoleScreen extends Screen {
     // Game, the player is currently playing (if there is only Game, and not its child, it means there is no game selected, and game selection screen is showed)
     private Game game = new Game();
 
-    public GamingConsoleScreen(Component title) {
+    public GamingConsoleScreen(Text title) {
         super(title);
 
         // Scans for games in player's inventory
@@ -87,36 +81,34 @@ public class GamingConsoleScreen extends Screen {
 
     // This screen doesn't pause the game when opened
     @Override
-    public boolean isPauseScreen() {
+    public boolean shouldPause() {
         return false;
     }
 
     // Main rendering method
-    @Override
-    public void render(@NotNull GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
-        renderBackground(graphics);
-        renderGameScreen(graphics, getConsoleX() + SCREEN_X, getConsoleY() + SCREEN_Y);
 
+
+    @Override
+    public void renderBackground(DrawContext graphics, int pMouseX, int pMouseY, float pPartialTick) {
+        super.renderBackground(graphics, pMouseX, pMouseY, pPartialTick);
+        renderMyBackground(graphics, pMouseX, pMouseY, pPartialTick);
+        renderGameScreen(graphics, getConsoleX() + SCREEN_X, getConsoleY() + SCREEN_Y);
         renderButtons(graphics);
-        super.render(graphics, pMouseX, pMouseY, pPartialTick);
     }
 
-    @Override
-    public void renderBackground(GuiGraphics graphics) {
-        // Renders dark semitransparent background
-        super.renderBackground(graphics);
-
-        // Renders console image
-        graphics.blit(BACKGROUD, getConsoleX(), getConsoleY(), 0, 0, 0, CONSOLE_WIDTH, CONSOLE_HEIGHT, 256, 256);
+    public void renderMyBackground(DrawContext context, int mouseX, int mouseY, float delta) {
+        //context.enableScissor(getConsoleX() + SCREEN_X, getConsoleY() + SCREEN_Y, getConsoleX() + SCREEN_X + Game.WIDTH, getConsoleY() + SCREEN_Y + Game.HEIGHT);
+        context.drawTexture(BACKGROUND, getConsoleX(), getConsoleY(), 0, 0, 0, CONSOLE_WIDTH, CONSOLE_HEIGHT, 256, 256);
+        //context.disableScissor();
     }
 
     /**
      * Renders game screen, including game, game selection, scores, etc.
-     * @param graphics GuiGraphics used for rendering
+     * @param graphics DrawContext used for rendering
      * @param x X position of the game screen
      * @param y Y position of the game screen
      */
-    private void renderGameScreen(GuiGraphics graphics, int x, int y) {
+    private void renderGameScreen(DrawContext graphics, int x, int y) {
         // Makes sure that nothing is rendered outside the game screen
         graphics.enableScissor(x, y, x + Game.WIDTH, y + Game.HEIGHT);
 
@@ -135,26 +127,35 @@ public class GamingConsoleScreen extends Screen {
 
     /**
      * Renders game selection screen
-     * @param graphics GuiGraphics used for rendering
+     * @param graphics DrawContext used for rendering
      * @param x X position
      * @param y Y position
      */
-    private void renderGameSelection(GuiGraphics graphics, int x, int y) {
+    private void renderGameSelection(DrawContext graphics, int x, int y) {
         // If there are some available games, it renders a selection marking on corresponding Y position
         if (!availableGames.isEmpty()) {
-            graphics.blit(
-                    new ResourceLocation(GameDiscsMod.MOD_ID, "textures/gui/selected.png"),
+            graphics.drawTexture(
+                    Identifier.of(GameDiscsMod.MOD_ID, "textures/gui/selected.png"),
                     x,
-                    y + 3 + font.lineHeight + 18 * selected - (Math.max(0, selected - 3) * 18),
+                    y + 3 + textRenderer.fontHeight + 18 * selected - (Math.max(0, selected - 3) * 18),
                     0, 0, 0, 140, 18, 140, 18
+            );
+        } else {
+            graphics.drawText(
+                    textRenderer,
+                    Text.translatable("gui.gamingconsole.no_selectable_game").formatted(Formatting.ITALIC),
+                    x + (Game.WIDTH - textRenderer.getWidth(Text.translatable("gui.gamingconsole.no_selectable_game").formatted(Formatting.BOLD).asOrderedText())) / 2,
+                    y + 26,
+                    0xace53b,
+                    false
             );
         }
 
         // Rendering "Select game" title, on top of the screen
-        graphics.drawString(
-                font,
-                Component.translatable("gui.gamingconsole.select_game").withStyle(ChatFormatting.BOLD),
-                x + (Game.WIDTH - font.width(Component.translatable("gui.gamingconsole.select_game").withStyle(ChatFormatting.BOLD).getVisualOrderText())) / 2,
+        graphics.drawText(
+                textRenderer,
+                Text.translatable("gui.gamingconsole.select_game").formatted(Formatting.BOLD),
+                x + (Game.WIDTH - textRenderer.getWidth(Text.translatable("gui.gamingconsole.select_game").formatted(Formatting.BOLD).asOrderedText())) / 2,
                 y + 3 - (Math.max(0, selected - 3) * 18),
                 0xace53b,
                 false
@@ -163,20 +164,20 @@ public class GamingConsoleScreen extends Screen {
         // Rendering all available games
         for (int i = 0; i < availableGames.size(); i++) {
             // Rendering name of the game
-            graphics.drawString(
-                    font,
+            graphics.drawText(
+                    textRenderer,
                     // If the game is currently selected, the title renders bold
-                    Component.literal(availableGames.get(i).getName().getString()).withStyle(availableGames.get(i).getColor(), i == selected ? ChatFormatting.BOLD : ChatFormatting.ITALIC),
+                    Text.literal(availableGames.get(i).getName().getString()).formatted(availableGames.get(i).getColor(), i == selected ? Formatting.BOLD : Formatting.ITALIC),
                     x + 22,
-                    y + 4 + font.lineHeight + 18 * i + (18 - font.lineHeight) / 2 - (Math.max(0, selected - 3) * 18),
-                    availableGames.get(i).getColor().getColor(),
+                    y + 4 + textRenderer.fontHeight + 18 * i + (18 - textRenderer.fontHeight) / 2 - (Math.max(0, selected - 3) * 18),
+                    availableGames.get(i).getColor().getColorValue(),
                     false
             );
             // Rendering icon of the game
-            graphics.blit(
+            graphics.drawTexture(
                     availableGames.get(i).getIcon(),
                     x + 3,
-                    y + 4 + font.lineHeight + 18 * i - (Math.max(0, selected - 3) * 18),
+                    y + 4 + textRenderer.fontHeight + 18 * i - (Math.max(0, selected - 3) * 18),
                     0, 0, 0, 16, 16, 16, 16
             );
         }
@@ -184,9 +185,9 @@ public class GamingConsoleScreen extends Screen {
 
     /**
      * Renders all visual buttons
-     * @param graphics GuiGraphics used for rendering
+     * @param graphics DrawContext used for rendering
      */
-    private void renderButtons(GuiGraphics graphics) {
+    private void renderButtons(DrawContext graphics) {
         W_BUTTON.render(graphics, getConsoleX(), getConsoleY(), game.controls.isButtonDown(Button.UP));
         A_BUTTON.render(graphics, getConsoleX(), getConsoleY(), game.controls.isButtonDown(Button.LEFT));
         D_BUTTON.render(graphics, getConsoleX(), getConsoleY(), game.controls.isButtonDown(Button.RIGHT));
@@ -202,18 +203,18 @@ public class GamingConsoleScreen extends Screen {
     public List<Game> scanForGames() {
         // Creating the list of the games
         List<Game> games = new ArrayList<>();
-        Player player = Objects.requireNonNull(Minecraft.getInstance().player);
+        PlayerEntity player = Objects.requireNonNull(MinecraftClient.getInstance().player);
 
         // Going through each slot of player's inventory
-        for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
+        for (int i = 0; i < player.getInventory().size(); i++) {
             // If the item is GameDisc, it creates the Game and adds it to the list
-            if (player.getInventory().getItem(i).getItem() instanceof GameDiscItem disc) {
+            if (player.getInventory().getStack(i).getItem() instanceof GameDiscItem disc) {
                 games.add(ClientUtils.newGameFor(disc));
             }
         }
+
         return games;
     }
-
 
     // Main method for pressed keys
     @Override
@@ -238,7 +239,7 @@ public class GamingConsoleScreen extends Screen {
         }
         else {
             if (key == 81) {
-                this.minecraft.setScreen(null);
+                this.client.setScreen(null);
                 return true;
             }
         }
@@ -344,8 +345,8 @@ public class GamingConsoleScreen extends Screen {
     }
 
     @Override
-    public void onClose() {
-        super.onClose();
+    public void close() {
+        super.close();
 
         game = null;
     }

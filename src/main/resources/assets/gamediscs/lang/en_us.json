@@ -6,9 +6,14 @@
   "gamediscs.slime": "Slime",
   "gamediscs.blocktris": "Blocktris",
   "gamediscs.tnt_sweeper": "Tnt Sweeper",
+  "gamediscs.grid_2048": "2048",
+  "gamediscs.plane_war": "Plane War",
   "gamediscs.pong": "Pong",
   "gamediscs.froggie": "Froggie",
-  "gamediscs.rabbit": "Rabbit",
+  "gamediscs.pong_game": "Pong",
+  "gamediscs.rabbit": "Jumpy Rabbit",
+  "gamediscs.gobang": "Gobang - Mutiplayer",
+  "gamediscs.gobang_ai": "Gobang - AI",
 
 
   "item.gamediscs.gaming_console": "Gaming Console",
@@ -24,10 +29,16 @@
   "item.gamediscs.game_disc_pong": "Game Disc",
   "item.gamediscs.game_disc_froggie": "Game Disc",
   "item.gamediscs.game_disc_rabbit": "Game Disc",
+  "item.gamediscs.game_disc_grid_2048": "Game Disc",
+  "item.gamediscs.game_disc_gobang": "Game Disc",
+  "item.gamediscs.game_disc_gobang_ai": "Game Disc",
+  "item.gamediscs.game_disc_plane_war": "Game Disc",
 
 
   "gui.gamingconsole.title": "Gaming Console",
   "gui.gamingconsole.press_any_key": "Press any key",
+  "gui.gamingconsole.ai_react": "AI rival",
+  "gui.gamingconsole.mutiplayer": "Mutiplayer",
   "gui.gamingconsole.select_game": "Select game",
   "gui.gamingconsole.score": "Score",
   "gui.gamingconsole.best_score": "Best",
@@ -36,6 +47,7 @@
   "gui.gamingconsole.died": "You lost!",
   "gui.gamingconsole.hold": "Hold",
   "gui.gamingconsole.next": "Next",
+  "gui.gamingconsole.no_selectable_game": "No game disc loaded",
 
 
   "sounds.gamediscs.jump": "Gaming Console - Jumped",

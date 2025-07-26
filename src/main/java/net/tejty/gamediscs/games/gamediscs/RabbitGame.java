@@ -1,33 +1,33 @@
 package net.tejty.gamediscs.games.gamediscs;
 
-import net.minecraft.ChatFormatting;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.phys.Vec2;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec2f;
 import net.tejty.gamediscs.GameDiscsMod;
 import net.tejty.gamediscs.games.controls.Button;
 import net.tejty.gamediscs.games.graphics.AnimatedImage;
 import net.tejty.gamediscs.games.graphics.BreakParticleRenderer;
-import net.tejty.gamediscs.games.graphics.ParticleColor;
-import net.tejty.gamediscs.games.util.*;
+import net.tejty.gamediscs.games.util.Game;
+import net.tejty.gamediscs.games.util.GameStage;
+import net.tejty.gamediscs.games.util.ParticleLevel;
+import net.tejty.gamediscs.games.util.Sprite;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class RabbitGame extends Game {
     // The main player Sprite
-    private Sprite rabbit = new Sprite(new Vec2(10, HEIGHT), new Vec2(16, 16),
+    private Sprite rabbit = new Sprite(new Vec2f(10, HEIGHT), new Vec2f(16, 16),
             new AnimatedImage(
-                    new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/rabbit_run.png"),
+                    Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/rabbit_run.png"),
                     16, 48, 3, 2)
     );
     // List of cactus
     private List<Sprite> cactus = new ArrayList<>();
     // Ground Sprite
-    private final Sprite ground = new Sprite(new Vec2(0, HEIGHT - 16), new Vec2(156, 16),
-            new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/sand_ground.png"));
+    private final Sprite ground = new Sprite(new Vec2f(0, HEIGHT - 16), new Vec2f(156, 16),
+            Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/sand_ground.png"));
 
     // Countdown of spawning another cactus
     private int cactusSpawnTimer = 0;
@@ -43,14 +43,14 @@ public class RabbitGame extends Game {
         super.prepare();
 
         // Resets everything
-        rabbit = new Sprite(new Vec2(10, HEIGHT - ground.getHeight() - 16), new Vec2(16, 16),
+        rabbit = new Sprite(new Vec2f(10, HEIGHT - ground.getHeight() - 16), new Vec2f(16, 16),
                 new AnimatedImage(
-                        new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/rabbit_run.png"),
+                        Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/rabbit_run.png"),
                         16, 48, 3, 2)
         );
         cactus = new ArrayList<>();
         speed = -3f;
-        ground.setVelocity(new Vec2(speed, 0));
+        ground.setVelocity(new Vec2f(speed, 0));
         rabbit.show();
     }
 
@@ -76,7 +76,7 @@ public class RabbitGame extends Game {
         if (stage != GameStage.DIED && stage != GameStage.WON) {
             ground.tick();
             if (ground.getX() <= -16) {
-                ground.moveBy(new Vec2(16, 0));
+                ground.moveBy(new Vec2f(16, 0));
             }
         }
     }
@@ -89,10 +89,10 @@ public class RabbitGame extends Game {
         rabbit.tick();
 
         // Adds velocity down to the rabbit (gravity)
-        rabbit.addVelocity(new Vec2(0, 1f));
+        rabbit.addVelocity(new Vec2f(0, 1f));
 
         speed -= 0.005f;
-        ground.setVelocity(new Vec2(speed, 0));
+        ground.setVelocity(new Vec2f(speed, 0));
 
         // Spawns a cactus at the right time
         if (cactusSpawnTimer <= 0) {
@@ -123,14 +123,14 @@ public class RabbitGame extends Game {
                 die();
             }
 
-            obstacle.setVelocity(new Vec2(speed, 0));
+            obstacle.setVelocity(new Vec2f(speed, 0));
 
             i++;
         }
 
         if (rabbit.isTouching(ground)) {
             rabbit.setY(HEIGHT - ground.getHeight() - rabbit.getHeight());
-            rabbit.setVelocity(Vec2.ZERO);
+            rabbit.setVelocity(Vec2f.ZERO);
         }
 
         // Counting down the cactus spawning
@@ -142,7 +142,7 @@ public class RabbitGame extends Game {
         super.die();
         rabbit.hide();
         spawnParticleExplosion(
-                () -> new BreakParticleRenderer(new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/rabbit.png"), 10, 32),
+                () -> new BreakParticleRenderer(Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/rabbit.png"), 10, 32),
                 rabbit.getCenterPos(),
                 20,
                 2,
@@ -155,11 +155,11 @@ public class RabbitGame extends Game {
      * Spawns new cactus
      */
     private void spawnCactus() {
-        cactus.add(new Sprite(new Vec2(WIDTH, HEIGHT - ground.getHeight() - 10), new Vec2(8, 16), new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/cactus.png")));
-        cactus.get(cactus.size() - 1).setVelocity(new Vec2(speed, 0f));
+        cactus.add(new Sprite(new Vec2f(WIDTH, HEIGHT - ground.getHeight() - 10), new Vec2f(8, 16), Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/cactus.png")));
+        cactus.get(cactus.size() - 1).setVelocity(new Vec2f(speed, 0f));
     }
     @Override
-    public synchronized void render(GuiGraphics graphics, int posX, int posY) {
+    public synchronized void render(DrawContext graphics, int posX, int posY) {
         // Calls render of super
         super.render(graphics, posX, posY);
 
@@ -189,26 +189,26 @@ public class RabbitGame extends Game {
 
         // If an action button was pressed, bird sets velocity to up (jumps)
         if (button.isActionButton() && rabbit.getY() >= HEIGHT - ground.getHeight() - rabbit.getHeight()) {
-            rabbit.setVelocity(new Vec2(0, -6f));
+            rabbit.setVelocity(new Vec2f(0, -6f));
             if (stage == GameStage.PLAYING) {
                 soundPlayer.playJump();
             }
         }
     }
     @Override
-    public ResourceLocation getBackground() {
-        return new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/background/rabbit_background.png");
+    public Identifier getBackground() {
+        return Identifier.of(GameDiscsMod.MOD_ID, "textures/games/background/rabbit_background.png");
     }
     @Override
     public boolean showScoreBox() {
         return false;
     }
     @Override
-    public Component getName() {
-        return Component.translatable("gamediscs.rabbit");
+    public Text getName() {
+        return Text.translatable("gamediscs.rabbit");
     }
     @Override
-    public ResourceLocation getIcon() {
-        return new ResourceLocation(GameDiscsMod.MOD_ID, "textures/item/game_disc_rabbit.png");
+    public Identifier getIcon() {
+        return Identifier.of(GameDiscsMod.MOD_ID, "textures/item/game_disc_rabbit.png");
     }
 }

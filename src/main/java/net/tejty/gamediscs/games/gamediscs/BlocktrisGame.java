@@ -1,15 +1,15 @@
 package net.tejty.gamediscs.games.gamediscs;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.phys.Vec2;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.Font;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec2f;
 import net.tejty.gamediscs.GameDiscsMod;
 import net.tejty.gamediscs.games.controls.Button;
 import net.tejty.gamediscs.games.graphics.BasicParticleRenderer;
-import net.tejty.gamediscs.games.graphics.BreakParticleRenderer;
 import net.tejty.gamediscs.games.graphics.MultiImage;
 import net.tejty.gamediscs.games.graphics.ParticleColor;
 import net.tejty.gamediscs.games.util.*;
@@ -33,7 +33,7 @@ public class BlocktrisGame extends Game {
                 23,
                 5,
                 new MultiImage(
-                        new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/cubes.png"),
+                        Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/cubes.png"),
                         5, 40, 8));
 
         int type = random.nextInt(7);
@@ -54,7 +54,7 @@ public class BlocktrisGame extends Game {
                 23,
                 5,
                 new MultiImage(
-                        new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/sprite/cubes.png"),
+                        Identifier.of(GameDiscsMod.MOD_ID, "textures/games/sprite/cubes.png"),
                         5, 40, 8));
 
         int type = random.nextInt(0, 7);
@@ -99,7 +99,7 @@ public class BlocktrisGame extends Game {
     }
 
     @Override
-    public synchronized void render(GuiGraphics graphics, int posX, int posY) {
+    public synchronized void render(DrawContext graphics, int posX, int posY) {
         super.render(graphics, posX, posY);
 
         grid.render(graphics, posX + 45, posY - 15);
@@ -118,11 +118,11 @@ public class BlocktrisGame extends Game {
             hold.renderCentered(graphics, posX, posY);
         }
 
-        Font font = Minecraft.getInstance().font;
-        Component text = Component.translatable("gui.gamingconsole.hold");
-        graphics.drawString(font, text, 22 + posX - font.width(text.getVisualOrderText()) / 2, 16 + posY, 0x555555, false);
-        text = Component.translatable("gui.gamingconsole.next");
-        graphics.drawString(font, text, 118 + posX - font.width(text.getVisualOrderText()) / 2, 6 + posY, 0x555555, false);
+        TextRenderer font = MinecraftClient.getInstance().textRenderer;
+        Text text = Text.translatable("gui.gamingconsole.hold");
+        graphics.drawText(font, text, 22 + posX - font.getWidth(text.asOrderedText()) / 2, 16 + posY, 0x555555, false);
+        text = Text.translatable("gui.gamingconsole.next");
+        graphics.drawText(font, text, 118 + posX - font.getWidth(text.asOrderedText()) / 2, 6 + posY, 0x555555, false);
 
         renderParticles(graphics, posX, posY);
 
@@ -135,21 +135,21 @@ public class BlocktrisGame extends Game {
         if (stage == GameStage.PLAYING && ticks > 5) {
             if (button == Button.UP) {
                 piece.rotate();
-                soundPlayer.play(SoundRegistry.SWING.get(), 1.5f, 0.5f);
+                soundPlayer.play(SoundRegistry.SWING, 1.5f, 0.5f);
                 placementCooldown = 10;
             }
             if (button == Button.LEFT) {
                 piece.move(-1, 0);
-                soundPlayer.play(SoundRegistry.SHOOT.get(), 2.5f, 0.1f);
+                soundPlayer.play(SoundRegistry.SHOOT, 2.5f, 0.1f);
                 placementCooldown = 10;
             }
             if (button == Button.RIGHT) {
                 piece.move(1, 0);
-                soundPlayer.play(SoundRegistry.SHOOT.get(), 2.5f, 0.1f);
+                soundPlayer.play(SoundRegistry.SHOOT, 2.5f, 0.1f);
                 placementCooldown = 10;
             }
             if (button == Button.DOWN) {
-                soundPlayer.play(SoundRegistry.SHOOT.get(), 2.5f, 0.1f);
+                soundPlayer.play(SoundRegistry.SHOOT, 2.5f, 0.1f);
                 if (piece.move(0, 1)) {
                     placePiece();
                 }
@@ -158,13 +158,13 @@ public class BlocktrisGame extends Game {
                 }
             }
             if (button == Button.BUTTON1) {
-                soundPlayer.play(SoundRegistry.EXPLOSION.get(), 0.7f, 0.5f);
+                soundPlayer.play(SoundRegistry.EXPLOSION, 0.7f, 0.5f);
                 piece.hardDrop();
                 placePiece();
             }
             if (button == Button.BUTTON2) {
                 if (!switched) {
-                    soundPlayer.play(SoundRegistry.SWITCH.get(), 0.6f, 0.5f);
+                    soundPlayer.play(SoundRegistry.SWITCH, 0.6f, 0.5f);
                     BlocktrisPiece oldHold = hold;
                     hold = piece;
                     if (oldHold != null) {
@@ -185,14 +185,14 @@ public class BlocktrisGame extends Game {
         if (stage == GameStage.PLAYING && ticks % 2 == 0) {
             if (controls.isButtonDown(Button.LEFT) && !controls.wasButtonDown(Button.LEFT)) {
                 piece.move(-1, 0);
-                soundPlayer.play(SoundRegistry.SHOOT.get(), 2.5f, 0.1f);
+                soundPlayer.play(SoundRegistry.SHOOT, 2.5f, 0.1f);
             }
             if (controls.isButtonDown(Button.RIGHT) && !controls.wasButtonDown(Button.RIGHT)) {
                 piece.move(1, 0);
-                soundPlayer.play(SoundRegistry.SHOOT.get(), 2.5f, 0.1f);
+                soundPlayer.play(SoundRegistry.SHOOT, 2.5f, 0.1f);
             }
             if (controls.isButtonDown(Button.DOWN) && !controls.wasButtonDown(Button.DOWN)) {
-                soundPlayer.play(SoundRegistry.SHOOT.get(), 2.5f, 0.1f);
+                soundPlayer.play(SoundRegistry.SHOOT, 2.5f, 0.1f);
                 if (piece.move(0, 1)) {
                     placePiece();
                 }
@@ -227,7 +227,7 @@ public class BlocktrisGame extends Game {
                                 spawnParticleExplosion(
                                         () ->
                                                 new BasicParticleRenderer(ParticleColor.random(random)),
-                                        new Vec2(45 + x * 5, y * 5 - 15),
+                                        new Vec2f(45 + x * 5, y * 5 - 15),
                                         4,
                                         3,
                                         5,
@@ -275,8 +275,8 @@ public class BlocktrisGame extends Game {
     }
 
     @Override
-    public ResourceLocation getBackground() {
-        return new ResourceLocation(GameDiscsMod.MOD_ID, "textures/games/background/blocktris_bakground.png");
+    public Identifier getBackground() {
+        return Identifier.of(GameDiscsMod.MOD_ID, "textures/games/background/blocktris_bakground.png");
     }
 
     @Override
@@ -290,12 +290,12 @@ public class BlocktrisGame extends Game {
     }
 
     @Override
-    public Component getName() {
-        return Component.translatable("gamediscs.blocktris");
+    public Text getName() {
+        return Text.translatable("gamediscs.blocktris");
     }
 
     @Override
-    public ResourceLocation getIcon() {
-        return new ResourceLocation(GameDiscsMod.MOD_ID, "textures/item/game_disc_blocktris.png");
+    public Identifier getIcon() {
+        return Identifier.of(GameDiscsMod.MOD_ID, "textures/item/game_disc_blocktris.png");
     }
 }
