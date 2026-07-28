@@ -7,9 +7,12 @@ import java.util.List;
 public final class OreCrafterPhysicsWorld {
     private static final float GRAVITY = 0.28F;
     private static final float MAX_FALL_SPEED = 5.0F;
-    private static final float MAX_ANGULAR_SPEED = 0.18F;
+    private static final float MAX_ANGULAR_SPEED = 0.10F;
     private static final float RESTITUTION = 0.08F;
     private static final float FRICTION = 0.45F;
+    private static final float SPIN_IMPACT_THRESHOLD = 0.65F;
+    private static final float RESTING_SPEED = 0.45F;
+    private static final float RESTING_ANGULAR_DAMPING = 0.68F;
     private static final int SOLVER_ITERATIONS = 10;
     private static final int POSITION_ITERATIONS = 16;
     private static final float POSITION_SLOP = 0.02F;
@@ -68,6 +71,7 @@ public final class OreCrafterPhysicsWorld {
                 resolveBounds(body);
             }
         }
+        stabilizeRestingContacts();
         separateResidualOverlaps();
         return contacts;
     }
@@ -137,9 +141,12 @@ public final class OreCrafterPhysicsWorld {
         if (body.y + extent > floor) {
             body.y = floor - extent;
             if (body.velocityY > 0.0F) {
+                float impactSpeed = body.velocityY;
                 body.velocityY = body.velocityY < 0.35F ? 0.0F : -body.velocityY * RESTITUTION;
                 body.velocityX *= 0.84F;
-                body.angularVelocity += body.velocityX * 0.008F;
+                if (impactSpeed > SPIN_IMPACT_THRESHOLD) {
+                    body.angularVelocity += body.velocityX * 0.004F;
+                }
             }
             if (Math.abs(body.velocityX) < 0.02F) {
                 body.velocityX = 0.0F;
@@ -207,12 +214,15 @@ public final class OreCrafterPhysicsWorld {
         float impulse = -(1.0F + RESTITUTION) * normalSpeed / inverseMassSum;
         applyImpulse(first, second, collision.normalX() * impulse, collision.normalY() * impulse);
 
-        float deltaX = second.x - first.x;
-        float deltaY = second.y - first.y;
-        float tangentOffset = deltaX * -collision.normalY() + deltaY * collision.normalX();
-        float impactSpin = tangentOffset * impulse * inverseMassSum * 0.008F;
-        first.angularVelocity += impactSpin;
-        second.angularVelocity += impactSpin;
+        float impactSpeed = -normalSpeed;
+        if (impactSpeed > SPIN_IMPACT_THRESHOLD) {
+            float deltaX = second.x - first.x;
+            float deltaY = second.y - first.y;
+            float tangentOffset = deltaX * -collision.normalY() + deltaY * collision.normalX();
+            float impactSpin = tangentOffset * (impactSpeed - SPIN_IMPACT_THRESHOLD) * 0.004F;
+            first.angularVelocity += impactSpin * first.inverseMass() / inverseMassSum;
+            second.angularVelocity -= impactSpin * second.inverseMass() / inverseMassSum;
+        }
 
         relativeX = second.velocityX - first.velocityX;
         relativeY = second.velocityY - first.velocityY;
@@ -226,9 +236,51 @@ public final class OreCrafterPhysicsWorld {
             float limit = impulse * FRICTION;
             tangentImpulse = Math.max(-limit, Math.min(limit, tangentImpulse));
             applyImpulse(first, second, tangentX * tangentImpulse, tangentY * tangentImpulse);
-            float spin = tangentImpulse * 0.0035F;
+            float spin = tangentImpulse * 0.002F;
             first.angularVelocity -= spin;
             second.angularVelocity += spin;
+        }
+    }
+
+    private void stabilizeRestingContacts() {
+        boolean[] resting = new boolean[bodies.size()];
+        for (int i = 0; i < bodies.size(); i++) {
+            OreBlockBody body = bodies.get(i);
+            if (body.y + body.extent() >= floor - POSITION_SLOP && Math.abs(body.velocityY) <= RESTING_SPEED) {
+                resting[i] = true;
+            }
+        }
+
+        float maximumRelativeSpeedSquared = RESTING_SPEED * RESTING_SPEED;
+        for (int i = 0; i < bodies.size(); i++) {
+            for (int j = i + 1; j < bodies.size(); j++) {
+                if (detect(bodies.get(i), bodies.get(j)) == null) {
+                    continue;
+                }
+                OreBlockBody first = bodies.get(i);
+                OreBlockBody second = bodies.get(j);
+                float relativeX = second.velocityX - first.velocityX;
+                float relativeY = second.velocityY - first.velocityY;
+                if (relativeX * relativeX + relativeY * relativeY <= maximumRelativeSpeedSquared) {
+                    resting[i] = true;
+                    resting[j] = true;
+                }
+            }
+        }
+
+        for (int i = 0; i < bodies.size(); i++) {
+            if (!resting[i]) {
+                continue;
+            }
+            OreBlockBody body = bodies.get(i);
+            body.angularVelocity *= RESTING_ANGULAR_DAMPING;
+            body.velocityX *= 0.90F;
+            if (Math.abs(body.angularVelocity) < 0.004F) {
+                body.angularVelocity = 0.0F;
+            }
+            if (Math.abs(body.velocityX) < 0.015F) {
+                body.velocityX = 0.0F;
+            }
         }
     }
 

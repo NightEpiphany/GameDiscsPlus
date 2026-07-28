@@ -16,6 +16,7 @@ import java.util.List;
 public final class OreCrafterTierCatalog {
     private static final String RESOURCE_PATH = "/data/gamediscs/games/ore_crafter/tier.json";
     private static final int MAX_SUPPORTED_TIERS = 32;
+    private static final float MAX_TIER_SIZE = 32.0F;
     private static final OreCrafterTierCatalog INSTANCE = load();
 
     private final List<Tier> tiers;
@@ -48,12 +49,14 @@ public final class OreCrafterTierCatalog {
             JsonObject root = JsonParser.parseReader(new InputStreamReader(stream, StandardCharsets.UTF_8)).getAsJsonObject();
             JsonObject tierValues = root.getAsJsonObject("tier");
             JsonObject scoreValues = root.getAsJsonObject("score");
+            JsonObject sizeValues = root.getAsJsonObject("size");
             int count = root.get("count").getAsInt();
-            if (count < 2 || count > MAX_SUPPORTED_TIERS || tierValues == null || scoreValues == null) {
+            if (count < 2 || count > MAX_SUPPORTED_TIERS || tierValues == null || scoreValues == null || sizeValues == null) {
                 throw new IllegalStateException("Invalid ore crafter tier count or sections");
             }
 
             List<Tier> loaded = new ArrayList<>(count);
+            float previousSize = 0.0F;
             for (int level = 1; level <= count; level++) {
                 String key = Integer.toString(level);
                 Identifier blockId = Identifier.parse(tierValues.get(key).getAsString());
@@ -66,7 +69,12 @@ public final class OreCrafterTierCatalog {
                 if (score < 0) {
                     throw new IllegalStateException("Negative score for ore crafter tier " + level);
                 }
-                loaded.add(new Tier(level, block, score, sizeFor(level)));
+                float size = sizeValues.get(key).getAsFloat();
+                if (!Float.isFinite(size) || size <= previousSize || size > MAX_TIER_SIZE) {
+                    throw new IllegalStateException("Ore crafter sizes must increase by tier: level " + level);
+                }
+                loaded.add(new Tier(level, block, score, size));
+                previousSize = size;
             }
             return new OreCrafterTierCatalog(loaded);
         } catch (Exception exception) {
@@ -86,13 +94,13 @@ public final class OreCrafterTierCatalog {
         List<Tier> fallback = new ArrayList<>(blockIds.length);
         for (int i = 0; i < blockIds.length; i++) {
             int level = i + 1;
-            fallback.add(new Tier(level, BuiltInRegistries.BLOCK.getValue(Identifier.parse(blockIds[i])), scores[i], sizeFor(level)));
+            fallback.add(new Tier(level, BuiltInRegistries.BLOCK.getValue(Identifier.parse(blockIds[i])), scores[i], defaultSizeFor(level)));
         }
         return new OreCrafterTierCatalog(fallback);
     }
 
-    private static float sizeFor(int level) {
-        return Math.round(6.0F + (level - 1) * 1.5F);
+    private static float defaultSizeFor(int level) {
+        return 6.0F + (level - 1) * 2.0F;
     }
 
     public record Tier(int level, Block block, int score, float size) {
