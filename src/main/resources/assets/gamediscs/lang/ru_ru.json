@@ -47,5 +47,22 @@
   "sounds.gamediscs.explosion": "Игровая консоль: взрыв",
   "sounds.gamediscs.shoot": "Игровая консоль: выстрел",
   "sounds.gamediscs.swing": "Игровая консоль: поворот",
-  "sounds.gamediscs.switch": "Игровая консоль: переключение"
+  "sounds.gamediscs.switch": "Игровая консоль: переключение",
+  "gamediscs.grid_2048": "2048",
+  "gamediscs.plane_war": "Plane War",
+  "gamediscs.rabbit": "Jumpy Rabbit",
+  "gamediscs.gobang": "Gobang - Mutiplayer",
+  "gamediscs.gobang_ai": "Gobang - AI",
+  "gamediscs.pacman": "Pac-Man",
+  "gamediscs.ore_crafter": "Ore Crafter",
+  "item.gamediscs.game_disc_rabbit": "Game Disc",
+  "item.gamediscs.game_disc_grid_2048": "Game Disc",
+  "item.gamediscs.game_disc_gobang": "Game Disc",
+  "item.gamediscs.game_disc_gobang_ai": "Game Disc",
+  "item.gamediscs.game_disc_plane_war": "Game Disc",
+  "item.gamediscs.game_disc_ore_crafter": "Game Disc",
+  "item.gamediscs.game_disc_pacman": "Game Disc",
+  "gui.gamingconsole.ai_react": "AI rival",
+  "gui.gamingconsole.mutiplayer": "Mutiplayer",
+  "gui.gamingconsole.no_selectable_game": "No game disc loaded"
 }

@@ -10,6 +10,8 @@
     "gamediscs:game_disc_grid_2048",
     "gamediscs:game_disc_gobang",
     "gamediscs:game_disc_gobang_ai",
-    "gamediscs:game_disc_plane_war"
+    "gamediscs:game_disc_plane_war",
+    "gamediscs:game_disc_ore_crafter",
+    "gamediscs:game_disc_pacman"
   ]
 }

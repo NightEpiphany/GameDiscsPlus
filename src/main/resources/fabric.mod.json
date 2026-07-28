@@ -1,25 +1,30 @@
 {
-  "schemaVersion": 1,
-  "id": "gamediscs",
-  "version": "${version}",
-  "name": "Game Discs",
-  "description": "",
-  "authors": [],
-  "contact": {},
-  "license": "MIT",
-  "icon": "assets/gamediscs/icon.png",
-  "environment": "*",
-  "entrypoints": {
-    "client": [
-      "net.tejty.gamediscs.client.GameDiscsModClient"
-    ],
-    "main": [
-      "net.tejty.gamediscs.GameDiscsMod"
-    ]
-  },
-  "depends": {
-    "fabricloader": ">=${loader_version}",
-    "fabric": "*",
-    "minecraft": "${minecraft_version}"
-  }
+	"schemaVersion": 1,
+	"id": "gamediscs",
+	"version": "${version}",
+	"name": "GameDiscs",
+	"description": "Common electronic games implemented for minecraft",
+	"authors": [
+		"NightEpiphany", "Tejty"
+	],
+	"license": "MIT",
+	"icon": "assets/gamediscs/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.moigferdsrte.gamediscs.GameDiscs"
+		],
+		"client": [
+			"com.moigferdsrte.gamediscs.client.GameDiscsClient"
+		]
+	},
+	"mixins": [
+		"gamediscs.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.19",
+		"minecraft": "~26.2",
+		"java": ">=25",
+		"fabric-api": "*"
+	}
 }

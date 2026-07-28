@@ -3,15 +3,9 @@
   "category": "misc",
   "group": "gaming",
   "key": {
-    "R": {
-      "item": "minecraft:redstone"
-    },
-    "C": {
-      "item": "minecraft:copper_ingot"
-    },
-    "Q": {
-      "item": "minecraft:quartz"
-    }
+    "R": "minecraft:redstone",
+    "C": "minecraft:copper_ingot",
+    "Q": "minecraft:quartz"
   },
   "pattern": [
     "Q",

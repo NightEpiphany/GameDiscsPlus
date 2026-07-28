@@ -13,6 +13,21 @@
   "gamediscs.rabbit": "兔子跑酷",
   "gamediscs.gobang": "五子棋 - 双人对战",
   "gamediscs.gobang_ai": "五子棋 - AI对战",
+  "gamediscs.grid_2048": "2048",
+  "gamediscs.pacman": "吃豆人",
+  "gamediscs.ore_crafter": "矿物合成师",
+  "gamediscs.ore_crafter.current_stage": "当前等阶：",
+  "gamediscs.ore_crafter.tier.1": "煤炭块",
+  "gamediscs.ore_crafter.tier.2": "铜块",
+  "gamediscs.ore_crafter.tier.3": "铁块",
+  "gamediscs.ore_crafter.tier.4": "黄金块",
+  "gamediscs.ore_crafter.tier.5": "青金石块",
+  "gamediscs.ore_crafter.tier.6": "红石块",
+  "gamediscs.ore_crafter.tier.7": "钻石块",
+  "gamediscs.ore_crafter.tier.8": "绿宝石块",
+  "gamediscs.ore_crafter.tier.9": "黑曜石",
+  "gamediscs.ore_crafter.tier.10": "远古残骸",
+  "gamediscs.ore_crafter.tier.11": "下界合金块",
 
 
   "item.gamediscs.gaming_console": "游戏掌机",
@@ -32,6 +47,8 @@
   "item.gamediscs.game_disc_gobang": "游戏驱动盘",
   "item.gamediscs.game_disc_gobang_ai": "游戏驱动盘",
   "item.gamediscs.game_disc_plane_war": "游戏驱动盘",
+  "item.gamediscs.game_disc_ore_crafter": "游戏驱动盘",
+  "item.gamediscs.game_disc_pacman": "游戏驱动盘",
 
 
   "gui.gamingconsole.title": "游戏掌机",

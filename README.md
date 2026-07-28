@@ -1,4 +1,4 @@
-# Game Discs Fabric Modified for 1.21.1
+# Game Discs Fabric Modified for 1.21.1 & 26.2+
 ## Based on the original mod:
 ### Additions:
 ![overhaul](img/img1.png)
@@ -8,3 +8,7 @@
 ![overhaul](img/img3.png)
 - Plane War
 ![overhaul](img/img4.png)
+- Ore Crafter
+  ![overhaul](img/img5.png)
+- Pacman
+    ![overhaul](img/img6.png)

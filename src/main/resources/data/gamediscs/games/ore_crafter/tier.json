@@ -1,0 +1,29 @@
+{
+  "tier": {
+    "1": "minecraft:coal_block",
+    "2": "minecraft:copper_block",
+    "3": "minecraft:iron_block",
+    "4": "minecraft:gold_block",
+    "5": "minecraft:lapis_block",
+    "6": "minecraft:redstone_block",
+    "7": "minecraft:diamond_block",
+    "8": "minecraft:emerald_block",
+    "9": "minecraft:obsidian",
+    "10": "minecraft:ancient_debris",
+    "11": "minecraft:netherite_block"
+  },
+  "score": {
+    "1": 100,
+    "2": 150,
+    "3": 300,
+    "4": 400,
+    "5": 550,
+    "6": 600,
+    "7": 800,
+    "8": 900,
+    "9": 1000,
+    "10": 2000,
+    "11": 2500
+  },
+  "count": 11
+}
