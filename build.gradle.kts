@@ -25,6 +25,13 @@ dependencies {
 
 	// Fabric API. This is technically optional, but you probably want it anyway.
 	implementation("net.fabricmc.fabric-api:fabric-api:${providers.gradleProperty("fabric_api_version").get()}")
+
+	testImplementation("org.junit.jupiter:junit-jupiter:5.12.2")
+	testRuntimeOnly("org.junit.platform:junit-platform-launcher:1.12.2")
+}
+
+tasks.test {
+	useJUnitPlatform()
 }
 
 tasks.processResources {

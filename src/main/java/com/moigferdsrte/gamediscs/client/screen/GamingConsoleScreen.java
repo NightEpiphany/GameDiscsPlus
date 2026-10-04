@@ -2,6 +2,7 @@ package com.moigferdsrte.gamediscs.client.screen;
 
 import net.minecraft.client.Minecraft;
 import com.moigferdsrte.gamediscs.client.render.GameGraphics;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.KeyEvent;
@@ -25,19 +26,19 @@ public final class GamingConsoleScreen extends Screen {
     private static final int CONSOLE_WIDTH = 160;
     private static final int CONSOLE_HEIGHT = 198;
 
-    // Position of the game screen relative to the left top corner of the console
     private static final int SCREEN_X = 10;
     private static final int SCREEN_Y = 10;
 
-    // Key codes of the using keys
-    // TODO configurable keys
-    private static final int W = 87;
-    private static final int S = 83;
-    private static final int A = 65;
-    private static final int D = 68;
-    private static final int SPACE = 32;
-    private static final int ENTER = 257;
+    private static final int W = InputConstants.KEY_W;
+    private static final int S = InputConstants.KEY_S;
+    private static final int A = InputConstants.KEY_A;
+    private static final int D = InputConstants.KEY_D;
+    private static final int SPACE = InputConstants.KEY_SPACE;
+    private static final int ENTER = InputConstants.KEY_RETURN;
+    private static final int Q = InputConstants.KEY_Q;
+    private static final int R = InputConstants.KEY_R;
 
+    // Minecraft 26.3 supplies the SDL scancode in KeyEvent.key().
     // Visual buttons that allow you to visually see if the button is pressed or not
     private static final VisualButton W_BUTTON = new VisualButton(BACKGROUND, 256, 256, 33, 121, 14, 24, 183, 0, 24);
     private static final VisualButton A_BUTTON = new VisualButton(BACKGROUND, 256, 256, 17, 137, 23, 15, 160, 0, 24);
@@ -221,51 +222,30 @@ public final class GamingConsoleScreen extends Screen {
         // If the game is not empty, tries to quit or reset the game if the corresponding key was pressed
         if (!game.isEmpty()) {
             // If the key was Q, returns to game selection (sets game to empty Game)
-            if (key == 81) {
+            if (key == Q) {
                 game = new Game();
                 flag = true;
                 game.soundPlayer.playConfirm();
             }
             // If the key was R, resets the game by calling prepare() method
-            else if (key == 82) {
+            else if (key == R) {
                 game.prepare();
                 flag = true;
                 game.soundPlayer.playConfirm();
             }
         }
         else {
-            if (key == 81) {
+            if (key == Q) {
                 this.minecraft.gui.setScreen(null);
                 return true;
             }
         }
         if (game != null) {
-            // Sets the buttons in game's controls to pressed state if the button was pressed
-            switch (key) {
-                case W -> {
-                    game.controls.setButton(Button.UP, true);
-                    flag = true;
-                }
-                case S -> {
-                    game.controls.setButton(Button.DOWN, true);
-                    flag = true;
-                }
-                case A -> {
-                    game.controls.setButton(Button.LEFT, true);
-                    flag = true;
-                }
-                case D -> {
-                    game.controls.setButton(Button.RIGHT, true);
-                    flag = true;
-                }
-                case SPACE -> {
-                    game.controls.setButton(Button.BUTTON1, true);
-                    flag = true;
-                }
-                case ENTER -> {
-                    game.controls.setButton(Button.BUTTON2, true);
-                    flag = true;
-                }
+            // Sets the button in game's controls to pressed state if a control key was pressed.
+            Button button = buttonForKey(key);
+            if (button != null) {
+                game.controls.setButton(button, true);
+                flag = true;
             }
         }
         if (game.isEmpty()) {
@@ -310,35 +290,31 @@ public final class GamingConsoleScreen extends Screen {
         boolean flag = false;
 
         if (game != null) {
-            // Trying to set button in game's controls to released state if the corresponding key was released
-            switch (key) {
-                case W -> {
-                    game.controls.setButton(Button.UP, false);
-                    flag = true;
-                }
-                case S -> {
-                    game.controls.setButton(Button.DOWN, false);
-                    flag = true;
-                }
-                case A -> {
-                    game.controls.setButton(Button.LEFT, false);
-                    flag = true;
-                }
-                case D -> {
-                    game.controls.setButton(Button.RIGHT, false);
-                    flag = true;
-                }
-                case SPACE -> {
-                    game.controls.setButton(Button.BUTTON1, false);
-                    flag = true;
-                }
-                case ENTER -> {
-                    game.controls.setButton(Button.BUTTON2, false);
-                    flag = true;
-                }
+            Button button = buttonForKey(key);
+            if (button != null) {
+                game.controls.setButton(button, false);
+                flag = true;
             }
         }
         return super.keyReleased(event) || flag;
+    }
+
+    /**
+     * Maps a 26.3 keyboard scancode to the console's virtual buttons.
+     *
+     * @param key the value returned by {@link KeyEvent#key()}
+     * @return the matching virtual button, or {@code null} for non-control keys
+     */
+    static Button buttonForKey(int key) {
+        return switch (key) {
+            case W -> Button.UP;
+            case S -> Button.DOWN;
+            case A -> Button.LEFT;
+            case D -> Button.RIGHT;
+            case SPACE -> Button.BUTTON1;
+            case ENTER -> Button.BUTTON2;
+            default -> null;
+        };
     }
 
 }
