@@ -56,7 +56,8 @@ public final class DiscLootTablesModifiers {
             Float chance = CHEST_TABLES.get(key.identifier());
             if (chance != null) {
                 tableBuilder.withPool(LootPool.lootPool()
-                        .add(TagEntry.expandTag(TagRegistry.Items.GAME_DISCS))
+                        .add(TagEntry.expandTag(registries.lookupOrThrow(Registries.ITEM)
+                                .getOrThrow(TagRegistry.Items.GAME_DISCS)))
                         .when(LootItemRandomChanceCondition.randomChance(chance)));
             }
 
