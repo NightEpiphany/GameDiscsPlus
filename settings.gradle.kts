@@ -14,4 +14,4 @@ pluginManagement {
 }
 
 // Should match your modid
-rootProject.name = "gamediscs"
+rootProject.name = "GD-26.2-fabric"
